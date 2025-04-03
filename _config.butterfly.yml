@@ -121,9 +121,9 @@ post_meta:
     date_type: created
     # Choose: date / relative
     date_format: date
-    categories: true
+    categories: false
     tags: false
-    label: true
+    label: false
   post:
     # Choose: left / center
     position: left
@@ -196,7 +196,7 @@ toc:
   post: true
   page: false
   number: true
-  expand: false
+  expand: true
   # Only for post
   style_simple: true
   scroll_percent: false
@@ -260,7 +260,7 @@ noticeOutdate:
 footer:
   owner:
     enable: true
-    since: 2019
+    since: 2025
   custom_text:
   # Copyright of theme and framework
   copyright: false
@@ -357,6 +357,7 @@ aside:
 # --------------------------------------
 
 # The distance between the bottom right button and the bottom (default unit: px)
+# 控制右下角悬浮按钮（rightside按钮）与页面底部距离
 rightside_bottom:
 
 # Conversion between Traditional and Simplified Chinese
@@ -374,7 +375,7 @@ translate:
   msgToSimplifiedChinese: '簡'
 
 # Read Mode
-readmode: true
+readmode: false
 
 # Dark Mode
 darkmode:
@@ -385,12 +386,13 @@ darkmode:
   # autoChangeMode: 1  Following System Settings, if the system doesn't support dark mode, it will switch dark mode between 6 pm to 6 am
   # autoChangeMode: 2  Switch dark mode between 6 pm to 6 am
   # autoChangeMode: false
-  autoChangeMode: false
+  autoChangeMode: 1
   # Set the light mode time. The value is between 0 and 24. If not set, the default value is 6 and 18
   start:
   end:
 
 # Show scroll percent in scroll-to-top button
+# ​控制“返回顶部”按钮是否显示滚动百分比 
 rightside_scroll_percent: false
 
 # Don't modify the following settings unless you know how they work
@@ -433,10 +435,11 @@ wordcount:
   total_wordcount: true
 
 # Busuanzi count for PV / UV in site
+# 关闭文章阅读数量统计
 busuanzi:
-  site_uv: true
-  site_pv: true
-  page_pv: true
+  site_uv: false
+  site_pv: false
+  page_pv: false
 
 # --------------------------------------
 # Math
@@ -1033,7 +1036,7 @@ inject:
   head:
     # - <link rel="stylesheet" href="/xxx.css">
     - <link href="https://fonts.loli.net/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    - <link rel="stylesheet" href="/css/custom.css?1">
+    - <link rel="stylesheet" href="/css/custom.css">
   bottom:
   # - <script src="xxxx"></script>
 
