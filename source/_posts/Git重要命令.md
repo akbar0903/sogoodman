@@ -2,15 +2,15 @@
 title: Git重要命令
 date: 2025-04-01 14:00:35
 tags: ['Git']
-categories: Git学习笔记
-cover: https://blog-ultimate.oss-cn-beijing.aliyuncs.com/cover/elephant.jpg
+categories: Git笔记
+cover: https://blog-ultimate.oss-cn-beijing.aliyuncs.com/cover/R.jpg
 ---
 
 # 查看日志，版本号
 **详细日志用`git log`命令查看：**
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/Snipaste_2025-04-03_19-44-50.png)
 
-**也可以用`git log --oneline`命令简洁的日志：**
+**也可以用`git log --oneline`命令查看简洁的日志：**
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/Snipaste_2025-04-03_19-20-42.png)
 
 
