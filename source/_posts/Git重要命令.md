@@ -2,7 +2,7 @@
 title: Git重要命令
 date: 2025-04-01 14:00:35
 tags: ['Git']
-categories: Git笔记
+categories: Git
 cover: https://blog-ultimate.oss-cn-beijing.aliyuncs.com/cover/R.jpg
 ---
 

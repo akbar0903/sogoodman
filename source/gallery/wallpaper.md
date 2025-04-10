@@ -14,4 +14,5 @@ aside: false
 ![](https://www4.bing.com//th?id=OHR.RedFoxDad_ZH-CN4894022141_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp)
 ![](https://www4.bing.com//th?id=OHR.IndianStarTortoise_ZH-CN7177478610_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp)
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20250406220211069.png)
+![](https://cn.bing.com//th?id=OHR.LittleFoxes_ZH-CN8622806156_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp)
 {% endgallery %}
