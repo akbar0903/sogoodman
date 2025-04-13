@@ -1,6 +1,5 @@
 ---
 title: Gallery
-type: 
 date: 2025-04-02 16:28:21
 aside: false
 ---

@@ -21,6 +21,7 @@ menu:
   Tags: /tags/ || fas fa-tags
   Categories: /categories/ || fas fa-folder-open
   Gallery: /gallery/ || fas fa-images
+  Music: /music/ || fas fa-music
   About: /about/ || fas fa-circle-exclamation
 
 # --------------------------------------
@@ -969,11 +970,12 @@ pjax:
   enable: false
   # Exclude the specified pages from pjax, such as '/music/'
   exclude:
-  # - /xxxxxx/
+  - /music/
 
 # Inject the css and script (aplayer/meting)
+# 设置音乐播放器
 aplayerInject:
-  enable: false
+  enable: true
   per_page: true
 
 # Snackbar - Toast Notification
