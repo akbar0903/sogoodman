@@ -357,8 +357,8 @@ aside:
 # --------------------------------------
 
 # The distance between the bottom right button and the bottom (default unit: px)
-# 控制右下角悬浮按钮（rightside按钮）与页面底部距离
-rightside_bottom:
+# 控制右下角悬浮按钮（rightside按钮）与页面底部距离，因为影响音乐播放器，所以设置成70px
+rightside_bottom: 70px
 
 # Conversion between Traditional and Simplified Chinese
 translate:
