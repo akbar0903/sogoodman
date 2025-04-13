@@ -21,7 +21,6 @@ menu:
   Tags: /tags/ || fas fa-tags
   Categories: /categories/ || fas fa-folder-open
   Gallery: /gallery/ || fas fa-images
-  Music: /music/ || fas fa-music
   About: /about/ || fas fa-circle-exclamation
 
 # --------------------------------------
@@ -967,7 +966,7 @@ note:
 
 # https://github.com/MoOx/pjax
 pjax:
-  enable: false
+  enable: true  # 打开别的页面的时候音乐不会中断
   # Exclude the specified pages from pjax, such as '/music/'
   exclude:
   - /music/
@@ -1040,6 +1039,8 @@ inject:
     - <link href="https://fonts.loli.net/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     - <link rel="stylesheet" href="/css/custom.css">
   bottom:
+    # 网易云音乐播放器
+    - <div class="aplayer no-destroy" data-id="8374108518" data-server="netease" data-type="playlist" data-fixed="true"> </div>
   # - <script src="xxxx"></script>
 
 # CDN Settings

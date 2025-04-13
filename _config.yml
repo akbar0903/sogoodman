@@ -102,3 +102,8 @@ theme: butterfly
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: ''
+
+# 为了防止插入重复的资源，需要把 asset_inject 设为 false
+aplayer:
+  meting: true
+  asset_inject: false

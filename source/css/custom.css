@@ -1,8 +1,10 @@
+/* highlight.js代码块颜色调成 */
 html[data-theme='dark'] {
   --hl-bg: #242424;
   --hlnumber-bg: #242424;
 }
 
+/* 整体背景颜色调整 */
 [data-theme='dark'] {
   --global-bg: oklch(0.141 0.005 285.823);
   --font-color: oklch(1 0 0);
@@ -10,6 +12,7 @@ html[data-theme='dark'] {
   --blockquote-color: oklch(1 0 0);
 }
 
+/* 主内溶区域宽度 */
 .layout {
   max-width: 1280px;
 }
