@@ -59,3 +59,42 @@ git commit -m '停止跟踪某个文件'
 **注意**
 如果使用`git rm [文件名]`命令，直接从暂存区和工作区中同时删除该文件，所以谨慎使用该命令。
 {% endnote %}
+
+# 远程仓库（remote）配置
+## 关联远程仓库
+这个操作我们应该很熟悉，因为这是我们每次在GitHub上创建完仓库以后第一个要做的事情。
+**命令：**
+```bash
+git remote add [远程仓库名字] [远程仓库地址]
+```
+**远程仓库名字**可以根据实际情况命名
+- 但平台常用`origin`。
+- 多平台见名知意就好，比如我有两个平台，一个是GitHub，一个是Gitee：
+```bash
+git remote add github [GitHub仓库地址]
+
+git remote add gitee [Gitee仓库地址]
+```
+**远程仓库地址支持两种协议：**
+- SSH协议：`git@github.com/repo.git`，这个配置有点麻烦，对初学者不友好。
+- HTTPS协议： `https://github.com/user/repo.git`，这个不需要配置，对初学者含友好。
+
+## 查看已配置的远程仓库
+**命令：**
+```bash
+git remote -v
+```
+
+## 修改远程仓库地址
+我原来关联的远程仓库是https协议的，因为各种原因，我想修改成ssh协议的，应该怎么做呢？
+**命令：**
+```bash
+# 修改远程仓库地址（HTTPS → SSH）
+git remote set-url [远程仓库名字] [新的远程仓库地址]
+```
+
+## 删除远程仓库
+**命令：**
+```bash
+git remote remove [远程仓库名字]
+```
