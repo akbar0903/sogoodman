@@ -7,6 +7,17 @@ categories: 'Markdown 语法'
 cover: https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20250413202233995.png
 ---
 
+# 新建
+hexo中有三种模板：
+- post：文章
+- draft：草稿
+- page：页面
+
+新建一个（文章，草稿，页面）命令：
+```shell
+hexo new [模板，比如post] ["title，比如:优秀项目学习"] --path [指定路径，比如:vue/优秀项目学习]
+```
+
 # 页面配置
 > butterfly官方文档：https://butterfly.js.org/posts/dc584b87/
 
