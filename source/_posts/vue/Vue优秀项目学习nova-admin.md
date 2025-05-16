@@ -1,5 +1,5 @@
 ---
-title: 优秀项目学习——nova-admin
+title: Vue优秀项目学习——nova-admin
 date: 2025-04-16 20:13:04
 tags: ['Vue3']
 categories: '优秀项目学习'
@@ -416,3 +416,64 @@ const handleResetPwd = () => {
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20250416211703965.png)
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20250416211733602.png)
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20250416211753206.png)
+
+# pinia配置
+> pinia官方文档：https://pinia.vuejs.org/zh/
+
+**目录解构：**
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20250417134719532.png)
+
+{% codeblock lang:ts app-store mark:5,8-9,11-14,16-19%}
+import { defineStore } from 'pinia'
+import { computed, type Ref } from 'vue'
+import { useColorMode } from '@vueuse/core'
+
+const { system, store } = useColorMode()
+
+export const useAppStore = defineStore('app-store', () => {
+  // 对外暴露的响应式状态
+  const colorMode: Ref<'light' | 'dark' | 'auto'> = store
+
+  // 计算最终生效的颜色
+  const effectiveColorMode = computed(() => {
+    return store.value === 'auto' ? system.value : store.value
+  })
+
+  // 切换模式
+  const setColorMode = (mode: 'light' | 'dark' | 'auto') => {
+    store.value = mode
+  }
+
+  return {
+    colorMode,
+    effectiveColorMode,
+    setColorMode,
+  }
+})
+{% endcodeblock %}
+
+在`index.ts`中统一进行导出：
+{% codeblock lang:ts 同意到处并且配置持久化 mark:2,5,9-10%}
+import { createPinia } from 'pinia'
+import piniaPluginPersistedState from 'pinia-plugin-persistedstate'
+
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedState)
+
+export default pinia
+
+// 统一导出
+export { useAppStore } from './app/index'
+{% endcodeblock %}
+
+在main.ts中给vue挂在`pinia`：
+{% codeblock lang:ts main.ts mark:2,7%}
+import { createApp } from 'vue'
+import pinia from './stores'
+import App from './App.vue'
+import './styles/index.css'
+
+const app = createApp(App)
+app.use(pinia)
+app.mount('#app')
+{% endcodeblock %}
