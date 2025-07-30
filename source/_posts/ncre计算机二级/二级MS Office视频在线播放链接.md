@@ -23,13 +23,13 @@ Word第13题 https://www.iqiyi.com/v_1e7jrw1z1b8.html
 Word第14题 https://www.iqiyi.com/v_1pqretonikk.html 
 Word第15题 https://www.iqiyi.com/v_iz2ys1zg2c.html 
 Word第16题 https://www.iqiyi.com/v_fixjjvcxfg.html 
-Word第17题 {% label （重点题）green %} https://www.iqiyi.com/v_1cgs74at6o8.html 
+Word第17题{% label 重点题 green %}https://www.iqiyi.com/v_1cgs74at6o8.html 
 Word第18题 https://www.iqiyi.com/v_14qfil2pd24.html 
 Word第19题 https://www.iqiyi.com/v_d4eizc8760.html 
 Word第20题 https://www.iqiyi.com/v_1dc1g4n4w6w.html 
 Word第21题 https://www.iqiyi.com/v_277hxu1c9ig.html 
 Word第22题 https://www.iqiyi.com/v_1dueaxtc8lk.html 
-Word第23题 https://www.iqiyi.com/v_a94f7igc9c.html 
+Word第23题{% label 重点题 green %}https://www.iqiyi.com/v_a94f7igc9c.html 
 Word第24题 https://www.iqiyi.com/v_oln460vgec.html 
 Word第25题 https://www.iqiyi.com/v_1ux1ahgikag.html 
 Word第26题 https://www.iqiyi.com/v_tt9j6zlzyk.html 
@@ -63,13 +63,13 @@ Excel第13题 https://www.iqiyi.com/v_epgurft20c.html
 Excel第14题 https://www.iqiyi.com/v_1mc93ylsruc.html 
 Excel第15题 https://www.iqiyi.com/v_1vfx4m4o30g.html 
 Excel第16题 https://www.iqiyi.com/v_wm69ma77x0.html 
-Excel第17题 {% label （重点题）green %} https://www.iqiyi.com/v_1b8535ks6f8.html 
+Excel第17题{% label 重点题 green %}https://www.iqiyi.com/v_1b8535ks6f8.html 
 Excel第18题 https://www.iqiyi.com/v_socr7zt088.html 
 Excel第19题 https://www.iqiyi.com/v_1bbkulahoq0.html 
 Excel第20题https://www.iqiyi.com/v_1rj947bw63k.html 
 Excel第21题 https://www.iqiyi.com/v_2dzr9rv79kc.html 
 Excel第22题 https://www.iqiyi.com/v_1mo757f5hb0.html 
-Excel第23题 https://www.iqiyi.com/v_1awdj7xb5ng.html 
+Excel第23题{% label 重点题 green %}https://www.iqiyi.com/v_1awdj7xb5ng.html 
 Excel第24题 https://www.iqiyi.com/v_2272ycx25ac.html 
 Excel第25题 https://www.iqiyi.com/v_12bd6mvwvkc.html 
 Excel第26题 https://www.iqiyi.com/v_xrhcz1pkuo.html 
@@ -103,13 +103,13 @@ PPT第13题 https://www.iqiyi.com/v_m0y2gf6rtw.html
 PPT第14题 https://www.iqiyi.com/v_1lh5n6eia1s.html 
 PPT第15题 https://www.iqiyi.com/v_2eix3f18b5o.html 
 PPT第16题 https://v.qq.com/x/page/d3327h58i0o.html
-PPT第17题 {% label （重点题）green %} https://www.iqiyi.com/v_1sc0146th4s.html 
+PPT第17题{% label 重点题 green %}https://www.iqiyi.com/v_1sc0146th4s.html 
 PPT第18题 https://v.qq.com/x/page/l3327znvpd8.html 
 PPT第19题 https://www.iqiyi.com/v_1r66s3v2owc.html 
 PPT第20题https://www.iqiyi.com/v_2bo323xxirs.html 
 PPT第21题 https://www.iqiyi.com/v_2eh6rtro2r4.html 
 PPT第22题 https://www.iqiyi.com/v_1xk1fgno6ic.html 
-PPT第23题 https://www.iqiyi.com/v_1cyt9yfkheg.html 
+PPT第23题{% label 重点题 green %}https://www.iqiyi.com/v_1cyt9yfkheg.html 
 PPT第24题 https://www.iqiyi.com/v_psqrqyixbw.html 
 PPT第25题 https://www.iqiyi.com/v_h8fix9gwyc.html 
 PPT第26题 https://www.iqiyi.com/v_29298rapvxs.html 
