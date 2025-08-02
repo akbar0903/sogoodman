@@ -7,7 +7,7 @@ cover: https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/202505161
 ---
 
 # Word
-Word第1题https://www.iqiyi.com/v_242z0x7fc80.html  
+Word第1题{% label  数据库培训课程 %}https://www.iqiyi.com/v_242z0x7fc80.html  
 Word第2题https://www.iqiyi.com/v_pkoom9u8h0.html  
 Word第3题{% label 中国互联网发展状况统计情况 green %}https://www.iqiyi.com/v_1nvivn80ukk.html  
 Word第4题https://v.qq.com/x/page/m3574gk87m9.html （腾讯链接 以后需要更换） 
@@ -47,7 +47,7 @@ Word第37题 https://www.iqiyi.com/v_jcxd3wfuz4.html
 Word第38题 https://www.iqiyi.com/v_115u6il0uho.html 
 
 # Excel
-Excel第1题https://www.iqiyi.com/v_rfrdmby4vc.html  
+Excel第1题{% label  小李是东方公司的会计 %}https://www.iqiyi.com/v_rfrdmby4vc.html  
 Excel第2题https://www.iqiyi.com/v_1cp0iht8zec.html 
 Excel第3题https://www.iqiyi.com/v_f8fa597r70.html 
 Excel第4题{% label 某公司销售部门主管大华 green %}https://www.iqiyi.com/v_mv0u6k2zr8.html 
@@ -88,7 +88,7 @@ Excel第37题 https://www.iqiyi.com/v_1q0put3jp4k.html
 # PowerPoint
 
 PPT第1题{% label 计算机发展简史 green %}https://www.iqiyi.com/v_15j9lnor4xw.html  
-PPT第2题https://www.iqiyi.com/v_1orph2jy0fc.html  
+PPT第2题{% label  文静报告关于计算机行业的发展 %}https://www.iqiyi.com/v_1orph2jy0fc.html  
 PPT第3题https://v.qq.com/x/page/d3574hj6j7f.html  （腾讯链接 以后需要更换）
 PPT第4题https://www.iqiyi.com/v_20545k0qw60.html  
 PPT第5题https://www.iqiyi.com/v_29qk6qcfbiw.html  
