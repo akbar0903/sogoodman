@@ -14,8 +14,8 @@ Word第4题https://v.qq.com/x/page/m3574gk87m9.html （腾讯链接 以后需要
 Word第5题 https://www.iqiyi.com/v_2fkfx6gd0uk.html 
 Word第6题 https://www.iqiyi.com/v_1aun7z5n3k8.html 
 Word第7题{% label 质量管理的论文 green %} https://www.iqiyi.com/v_1ghvfttauus.html 
-Word第8题 https://www.iqiyi.com/v_2193d6f7de4.html  
-Word第9题 https://www.iqiyi.com/v_2536recr60c.html 
+Word第8题{% label 德国旅游业务 green %} https://www.iqiyi.com/v_2193d6f7de4.html  
+Word第9题{% label 高新技术企业政策 green %} https://www.iqiyi.com/v_2536recr60c.html 
 Word第10题 https://v.qq.com/x/page/f3220bfomth.html 
 Word第11题 https://www.iqiyi.com/v_28ki6lwn0mc.html 
 Word第12题 https://www.iqiyi.com/v_1596csk218s.html 
@@ -54,7 +54,7 @@ Excel第4题{% label 某公司销售部门主管大华 green %}https://www.iqiyi
 Excel第5题 https://www.iqiyi.com/v_29eqlelblgg.html 
 Excel第6题 https://www.iqiyi.com/v_1e1wgnqtq9g.html 
 Excel第7题{% label 销售经理小李销售情况统计 green %} https://www.iqiyi.com/v_17a18ad9s30.html 
-Excel第8题 https://www.iqiyi.com/v_1lds0j9xvio.html 
+Excel第8题{% label 晓雨任职人力资源部门 green %} https://www.iqiyi.com/v_1lds0j9xvio.html 
 Excel第9题 https://www.iqiyi.com/v_t494de3bg0.html 
 Excel第10题 https://www.iqiyi.com/v_ap6ctyt7ks.html 
 Excel第11题 https://www.iqiyi.com/v_obm13ehh5o.html 
@@ -102,7 +102,7 @@ PPT第12题 https://www.iqiyi.com/v_1zj8zpahch8.html
 PPT第13题 https://www.iqiyi.com/v_m0y2gf6rtw.html 
 PPT第14题 https://www.iqiyi.com/v_1lh5n6eia1s.html 
 PPT第15题{% label 中国梦 green %} https://www.iqiyi.com/v_2eix3f18b5o.html 
-PPT第16题 https://v.qq.com/x/page/d3327h58i0o.html
+PPT第16题{% label 第二次世界大战 green %} https://v.qq.com/x/page/d3327h58i0o.html
 PPT第17题{% label 天河二号 green %}https://www.iqiyi.com/v_1sc0146th4s.html 
 PPT第18题{% label 台湾日月潭 green %} https://v.qq.com/x/page/l3327znvpd8.html 
 PPT第19题{% label 魏老师审计业务档案管理 green %} https://www.iqiyi.com/v_1r66s3v2owc.html 
