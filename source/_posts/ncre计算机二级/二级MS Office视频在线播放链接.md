@@ -56,7 +56,7 @@ Excel第6题 https://www.iqiyi.com/v_1e1wgnqtq9g.html
 Excel第7题{% label 销售经理小李销售情况统计 green %} https://www.iqiyi.com/v_17a18ad9s30.html 
 Excel第8题{% label 晓雨任职人力资源部门 green %} https://www.iqiyi.com/v_1lds0j9xvio.html 
 Excel第9题{% label 小刘减免税政策清单 green %} https://www.iqiyi.com/v_t494de3bg0.html 
-Excel第10题 https://www.iqiyi.com/v_ap6ctyt7ks.html 
+Excel第10题{% label 小马公务员考试成绩 green %} https://www.iqiyi.com/v_ap6ctyt7ks.html 
 Excel第11题 https://www.iqiyi.com/v_obm13ehh5o.html 
 Excel第12题 https://www.iqiyi.com/v_2a8lk17bs8g.html 
 Excel第13题 https://www.iqiyi.com/v_epgurft20c.html 
@@ -92,7 +92,7 @@ PPT第2题{% label  文静报告关于计算机行业的发展 %}https://www.iqi
 PPT第3题https://v.qq.com/x/page/d3574hj6j7f.html  （腾讯链接 以后需要更换）
 PPT第4题https://www.iqiyi.com/v_20545k0qw60.html  
 PPT第5题{% label 儿童孤独症 green %}https://www.iqiyi.com/v_29qk6qcfbiw.html  
-PPT第6题 https://www.iqiyi.com/v_oenfqcxvx0.html 
+PPT第6题{% label 节能环保低碳 green %} https://www.iqiyi.com/v_oenfqcxvx0.html 
 PPT第7题 https://www.iqiyi.com/v_27pxqz8md0s.html 
 PPT第8题 https://www.iqiyi.com/v_1web13kpsjc.html 
 PPT第9题 https://www.iqiyi.com/v_28g8smsfef0.html 
