@@ -17,8 +17,8 @@ Word第7题{% label 质量管理的论文 green %} https://www.iqiyi.com/v_1ghvf
 Word第8题{% label 德国旅游业务 green %} https://www.iqiyi.com/v_2193d6f7de4.html  
 Word第9题{% label 高新技术企业政策 green %} https://www.iqiyi.com/v_2536recr60c.html 
 Word第10题 https://v.qq.com/x/page/f3220bfomth.html 
-Word第11题 https://www.iqiyi.com/v_28ki6lwn0mc.html 
-Word第12题 https://www.iqiyi.com/v_1596csk218s.html 
+Word第11题{% label 林涵对科普文章进行排版 green %} https://www.iqiyi.com/v_28ki6lwn0mc.html 
+Word第12题{% label 小徐对艺术史文章排版 green %} https://www.iqiyi.com/v_1596csk218s.html 
 Word第13题 https://www.iqiyi.com/v_1e7jrw1z1b8.html 
 Word第14题 https://www.iqiyi.com/v_1pqretonikk.html 
 Word第15题 https://www.iqiyi.com/v_iz2ys1zg2c.html 
@@ -57,8 +57,8 @@ Excel第7题{% label 销售经理小李销售情况统计 green %} https://www.i
 Excel第8题{% label 晓雨任职人力资源部门 green %} https://www.iqiyi.com/v_1lds0j9xvio.html 
 Excel第9题{% label 小刘减免税政策清单 green %} https://www.iqiyi.com/v_t494de3bg0.html 
 Excel第10题{% label 小马公务员考试成绩 green %} https://www.iqiyi.com/v_ap6ctyt7ks.html 
-Excel第11题 https://www.iqiyi.com/v_obm13ehh5o.html 
-Excel第12题 https://www.iqiyi.com/v_2a8lk17bs8g.html 
+Excel第11题{% label 李晓玲采购部门员工 green %} https://www.iqiyi.com/v_obm13ehh5o.html 
+Excel第12题{% label 主要城市的降水量 green %} https://www.iqiyi.com/v_2a8lk17bs8g.html 
 Excel第13题 https://www.iqiyi.com/v_epgurft20c.html 
 Excel第14题 https://www.iqiyi.com/v_1mc93ylsruc.html 
 Excel第15题 https://www.iqiyi.com/v_1vfx4m4o30g.html 
@@ -93,9 +93,9 @@ PPT第3题https://v.qq.com/x/page/d3574hj6j7f.html  （腾讯链接 以后需要
 PPT第4题https://www.iqiyi.com/v_20545k0qw60.html  
 PPT第5题{% label 儿童孤独症 green %}https://www.iqiyi.com/v_29qk6qcfbiw.html  
 PPT第6题{% label 节能环保低碳 green %} https://www.iqiyi.com/v_oenfqcxvx0.html 
-PPT第7题 https://www.iqiyi.com/v_27pxqz8md0s.html 
-PPT第8题 https://www.iqiyi.com/v_1web13kpsjc.html 
-PPT第9题 https://www.iqiyi.com/v_28g8smsfef0.html 
+PPT第7题{% label 某动物保护组织 green %} https://www.iqiyi.com/v_27pxqz8md0s.html 
+PPT第8题{% label 人力资源部就职的小张 green %} https://www.iqiyi.com/v_1web13kpsjc.html 
+PPT第9题{% label 小文介绍诺贝尔奖 green %} https://www.iqiyi.com/v_28g8smsfef0.html 
 PPT第10题 https://www.iqiyi.com/v_2cu39c73vcg.html 
 PPT第11题 https://www.iqiyi.com/v_kjnf5g00eo.html 
 PPT第12题 https://www.iqiyi.com/v_1zj8zpahch8.html 
