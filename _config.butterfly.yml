@@ -22,6 +22,7 @@ menu:
   Categories: /categories/ || fas fa-folder-open
   Gallery: /gallery/ || fas fa-images
   About: /about/ || fas fa-circle-exclamation
+  Admin: /admin/ || fas fa-user-tie
 
 # --------------------------------------
 # Code Blocks Settings

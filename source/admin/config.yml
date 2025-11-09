@@ -16,7 +16,6 @@ collections:
     create: true
     fields:
       - {label: "标题", name: "title", widget: "string"}
-      - {label: "摘要", name: "description", widget: "string", required: false}
       - {label: "发布日期", name: "date", widget: "datetime"}
       - {label: "更新日期", name: "updated", widget: "datetime", required: false}
       - {label: "标签", name: "tags", widget: "list"}
