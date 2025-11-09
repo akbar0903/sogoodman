@@ -7,6 +7,7 @@ cover: https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/202505161
 ---
 
 # Word
+
 Word第1题{% label  数据库培训课程 green %}https://www.iqiyi.com/v_242z0x7fc80.html  
 Word第2题{% label 在某学术期刊杂志社实习的李楠 green %}https://www.iqiyi.com/v_pkoom9u8h0.html  
 Word第3题{% label （16套）中国互联网发展状况统计情况 green %}https://www.iqiyi.com/v_1nvivn80ukk.html  
@@ -54,7 +55,7 @@ Excel第4题{% label （16套）某公司销售部门主管大华 green %}https:
 Excel第5题{% label 大地公司销售部助理文涵 green %} https://www.iqiyi.com/v_29eqlelblgg.html 
 Excel第6题{% label 国家统计局人口普查 green %} https://www.iqiyi.com/v_1e1wgnqtq9g.html 
 Excel第7题{% label （21套）销售经理小李销售情况统计 green %} https://www.iqiyi.com/v_17a18ad9s30.html 
-Excel第8题{% label 晓雨任职人力资源部门 green %} https://www.iqiyi.com/v_1lds0j9xvio.html 
+Excel第8题{% label （22套）晓雨任职人力资源部门 green %} https://www.iqiyi.com/v_1lds0j9xvio.html 
 Excel第9题{% label 小刘减免税政策清单 green %} https://www.iqiyi.com/v_t494de3bg0.html 
 Excel第10题{% label 小马公务员考试成绩 green %} https://www.iqiyi.com/v_ap6ctyt7ks.html 
 Excel第11题{% label 李晓玲采购部门员工 green %} https://www.iqiyi.com/v_obm13ehh5o.html 
@@ -62,7 +63,7 @@ Excel第12题{% label 主要城市的降水量 green %} https://www.iqiyi.com/v_
 Excel第13题{% label 阿文食品贸易公司销售部 green %} https://www.iqiyi.com/v_epgurft20c.html 
 Excel第14题{% label 采购部助理小何统计销售数据 green %} https://www.iqiyi.com/v_1mc93ylsruc.html 
 Excel第15题{% label 差旅费报销 green %} https://www.iqiyi.com/v_1vfx4m4o30g.html 
-Excel第16题 https://www.iqiyi.com/v_wm69ma77x0.html 
+Excel第16题{% label 小许是某企业人力资源部门 green %} https://www.iqiyi.com/v_wm69ma77x0.html 
 Excel第17题{% label （13套）某停车场计划调整收费标准 green %}https://www.iqiyi.com/v_1b8535ks6f8.html 
 Excel第18题{% label （18套）李东阳是某家用电器 green %}https://www.iqiyi.com/v_socr7zt088.html 
 Excel第19题{% label （19套）太平洋公司工资条 green %}https://www.iqiyi.com/v_1bbkulahoq0.html 
@@ -91,7 +92,7 @@ PPT第1题{% label （16套）计算机发展简史 green %}https://www.iqiyi.co
 PPT第2题{% label  文静报告关于计算机行业的发展 %}https://www.iqiyi.com/v_1orph2jy0fc.html  
 PPT第3题{% label 张晓薇是某企业人力资源部门 green %}https://v.qq.com/x/page/d3574hj6j7f.html  （腾讯链接 以后需要更换）
 PPT第4题https://www.iqiyi.com/v_20545k0qw60.html  
-PPT第5题{% label 儿童孤独症 green %}https://www.iqiyi.com/v_29qk6qcfbiw.html  
+PPT第5题{% label （23套）儿童孤独症 green %}https://www.iqiyi.com/v_29qk6qcfbiw.html  
 PPT第6题{% label 节能环保低碳 green %} https://www.iqiyi.com/v_oenfqcxvx0.html 
 PPT第7题{% label 某动物保护组织 green %} https://www.iqiyi.com/v_27pxqz8md0s.html 
 PPT第8题{% label 人力资源部就职的小张 green %} https://www.iqiyi.com/v_1web13kpsjc.html 
