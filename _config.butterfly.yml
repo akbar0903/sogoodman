@@ -53,7 +53,7 @@ social:
 # Image Settings
 # --------------------------------------
 
-favicon: /img/favicon.ico
+favicon: https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251109171757040.ico
 
 avatar:
   img: https://blog-ultimate.oss-cn-beijing.aliyuncs.com/avatar/avatar.jpg
