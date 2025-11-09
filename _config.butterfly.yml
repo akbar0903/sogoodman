@@ -53,7 +53,7 @@ social:
 # Image Settings
 # --------------------------------------
 
-favicon: /img/favicon.png
+favicon: /img/favicon.ico
 
 avatar:
   img: https://blog-ultimate.oss-cn-beijing.aliyuncs.com/avatar/avatar.jpg
@@ -799,7 +799,7 @@ beautify:
   # Specify the field to beautify (site or post)
   field: post
   # Specify the icon to be used as a prefix for the title, such as '\f0c1'
-  title_prefix_icon:
+  title_prefix_icon: 
   # Specify the color of the title prefix icon, such as '#F47466'
   title_prefix_icon_color:
 
@@ -966,16 +966,15 @@ note:
 
 # https://github.com/MoOx/pjax
 pjax:
-  enable: true  # 打开别的页面的时候音乐不会中断
+  enable: false  # 打开别的页面的时候音乐不会中断
   # Exclude the specified pages from pjax, such as '/music/'
   exclude:
-  - /music/
 
 # Inject the css and script (aplayer/meting)
 # 设置音乐播放器
 aplayerInject:
-  enable: true
-  per_page: true
+  enable: false
+  per_page: false
 
 # Snackbar - Toast Notification
 # https://github.com/polonel/SnackBar
@@ -1037,6 +1036,7 @@ inject:
   head:
     # - <link rel="stylesheet" href="/xxx.css">
     - <link href="https://fonts.loli.net/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    - <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
     - <link rel="stylesheet" href="/css/custom.css">
   bottom:
     # 网易云音乐播放器
