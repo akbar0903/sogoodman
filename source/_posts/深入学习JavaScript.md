@@ -317,7 +317,12 @@ console.log(friends.includes('Bob'))
 
 8. `concat()`：合并两个数组，然后返回一个新数组
 
-MDN 链接：https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat
+{% btn 
+'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat',
+'MDN 文档',
+far fa-hand-point-right,blue larger 
+%}
+
 
 ```js
 const array1 = ['a', 'b', 'c']
@@ -328,7 +333,7 @@ console.log(array3)
 // Expected output: Array ["a", "b", "c", "d", "e", "f"]
 ```
 
-9. `join()`：将一个数组（或一个类数组对象）的所有元素连接成一个字符串并返回这个字符串，用逗号或指定的分隔符字符串分隔。如果数组只有一个元素，那么将返回该元素而不使用分隔符。
+1. `join()`：将一个数组（或一个类数组对象）的所有元素连接成一个字符串并返回这个字符串，用逗号或指定的分隔符字符串分隔。如果数组只有一个元素，那么将返回该元素而不使用分隔符。
 
 > 如果省略参数，数组元素用逗号（,）分隔。
 > 如果 separator 是空字符串（""），则所有元素之间都没有任何字符。
@@ -1813,6 +1818,20 @@ rest2.numGuests ??= 10 // rest2.numGuests 赋值为 10（正确新增）
 
 # 事件参数
 
+## Event
+
+- **事件对象**：封装了事件发生时的具体信息（类型、时间戳、目标元素等）
+- **传递**：当事件被触发时，Event 对象会作为参数传递给事件处理函数
+
+```js
+// Event 对象会作为参数传递给事件处理函数
+const openModal = function (event) {
+  event.preventDefault();
+  modal.classList.remove('hidden');
+  overlay.classList.remove('hidden');
+};
+```
+
 示例代码：
 
 ```js
@@ -1834,7 +1853,12 @@ document.addEventListener('keyup', function (event) {
 
 <mark>因为是全局对象，所以在全局作用域中可以直接访问其属性和方法，而不需要显式引用 window。</mark>
 
-详细信息查看： https://developer.mozilla.org/zh-CN/docs/Web/API/Window
+{% btn 
+'https://developer.mozilla.org/zh-CN/docs/Web/API/Window',
+'MDN 文档',
+far fa-hand-point-right,blue larger 
+%}
+
 
 ## windwo.location
 
@@ -1856,7 +1880,12 @@ window.location = new Location // 浏览器内部创建好并挂载到 window �
 
 你无法 new Location，但浏览器已经替你创建好，并挂在 `window.location` 上供你使用。
 
-MDN 链接：https://developer.mozilla.org/zh-CN/docs/Web/API/Window/location
+{% btn 
+'https://developer.mozilla.org/zh-CN/docs/Web/API/Window/location',
+'MDN 文档',
+far fa-hand-point-right,blue larger 
+%}
+
 
 ### 属性
 
@@ -1891,7 +1920,12 @@ console.log(Window.prototype.hasOwnProperty('console')) // false
 console.log('console' in window) // true
 ```
 
-MDN 文档：https://developer.mozilla.org/zh-CN/docs/Web/API/Console_API
+{% btn 
+'https://developer.mozilla.org/zh-CN/docs/Web/API/Console_API',
+'MDN 文档',
+far fa-hand-point-right,blue larger 
+%}
+
 
 ### 常用的实例方法
 
@@ -1911,37 +1945,291 @@ document：window 的一个属性（window.document）
 
 通过 document 对象，可以访问和修改网页中的元素，实现动态交互效果。
 
-![image.png](https://p0-xtjj-private.juejin.cn/tos-cn-i-73owjymdk6/4868143e8b98479388aea90c72de6d5a~tplv-73owjymdk6-jj-mark-v1:0:0:0:0:5o6Y6YeR5oqA5pyv56S-5Yy6IEAgTmljb2xhc0NhZ2U=:q75.awebp?policy=eyJ2bSI6MywidWlkIjoiMTIyOTY3MDE4OTYzMTMzOSJ9&rk3s=f64ab15b&x-orig-authkey=f32326d3454f2ac7e96d3d06cdbb035152127018&x-orig-expires=1765244479&x-orig-sign=dDZ%2BYG3lPcm6Mttr93jfzZHvbv4%3D)
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251204103412659.png)
 
-MDN 文档： https://developer.mozilla.org/zh-CN/docs/Web/API/Document
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251204103720348.png)
 
-### 实例属性
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251204104530487.png)
+
+```js
+DOM (Document Object Model)
+│
+└── Node（所有节点的基类）
+    ├── Document            document
+    ├── Element             div, span, a, p...
+    ├── Text                文本节点
+    ├── Comment             注释节点
+    ├── Attr                属性节点
+    └── ... etc
+```
+
+{% btn 
+'https://developer.mozilla.org/zh-CN/docs/Web/API/Document',
+'MDN 文档',
+far fa-hand-point-right,blue larger 
+%}
+
+
+### 选择元素
 
 1. **document.documentElement**：获取根元素（如`<html>`）
 
 ```js
 // 4.获取根元素
-const rootElement = document.documentElement
+const rootElement = document.documentElement    // entire HTML document
 ```
 
 2. **document.title**：获取网页标题。
 
 ```js
-const title = document.title
+const title = document.title        // <head> element of the document 
 console.log(`Page title: ${title}`)
 ```
 
-3.**document.body**：获取 body 元素
+3. **document.body**：获取 body 元素
 
-### 实例方法
+```js
+console.log(document.body); // <body> element of the document
+```
 
-1. **document.querySelector()**：返回文档中与指定选择器匹配的`Element`对象。
+4. **document.querySelector**：返回文档中与指定选择器匹配的第一个`Element`对象。
 
-2. **document.querySelectorAll**：返回与指定的选择器组匹配的文档中的元素列表
+```js
+const header = document.querySelector('.header'); // first element with class 'header'
+```
 
-3. **getElementById()**：返回一个表示  `id`属性与指定字符串相匹配的元素的  `Element`  对象。
+5. **document.querySelectorAll**：返回与指定的选择器组匹配的文档中的元素列表，返回的对象是 NodeList。
 
-4. **document.getElementsByClassName()**：返回一个包含了所有指定类名的子元素的类数组对象。
+
+> NodeList 对象是节点的集合。
+> NodeList 不是一个数组，是一个类似数组的对象 (Like Array Object)。虽然 NodeList 不是一个数组，但是可以使用 forEach() 来迭代。
+
+6. **getElementById()**：返回一个表示`id`属性与指定字符串相匹配的元素的`Element`对象。(updated live)
+
+7. **document.getElementsByClassName()**：返回一个包含了所有指定类名的子元素的类数组对象。(updated live)
+
+8. **document.getElementsByTagName**：根据元素的标签名选择。(updated live)
+
+### 创建元素
+
+1. **document.createElement**：create a new element, and return it
+
+```js
+const message = document.createElement('div'); // create a new <div> element, and return it
+```
+
+2. **设置文本：`textContent`**
+
+不仅可以读取元素的文本，还可以设置文本。
+
+> `<input>`、`<textarea>` 等 可输入元素的内容并不是一个文本节点，而是存储在它们的 value 属性中。
+> 为什么呢？
+> 因为 `<input>` 标签是自闭合的，没有内部文本节点：
+
+```js
+const message = document.createElement('div'); // create a new <div> element, and return it
+message.textContent = 'We use cookies for improved functionality and analytics.';
+```
+
+3. `innerHTML`：设置或获取 HTML 语法表示的元素的后代。
+
+```js
+const message = document.createElement('div');
+message.innerHTML =
+  'We use cookies for improved functionality and analytics. <button class="btn btn--close-cookie">Got it!</button>';
+```
+
+4. **value**: current value of the [`<input>`] element as a string.
+
+{% btn 
+'https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLInputElement',
+'MDN 文档',
+far fa-hand-point-right,blue larger 
+%}
+
+比如：
+
+```js
+document.querySelector('input').value = 'Hello' // 正确 ✔
+document.querySelector('input').textContent = 'Hello' // 无效 ❌
+```
+
+```js
+<input type="text" />   <!-- 没有像 <p>xxx</p> 那样的内容节点 -->
+```
+
+### 插入元素
+
+1. **prepend**：作为第一个元素插入
+
+```js
+// 作为第一个子元素插入到header中
+header.prepend(message);
+```
+
+2. **append**：作为最后一个子元素插入
+
+```js
+// 作为最后一个子元素插入到header中
+header.append(message);
+```
+
+{% note primary modern %}
+需要注意的是：  
+如果一个元素已经存在于页面中，调用prepend或append会将其从原来的位置移动到新的位置，而不是再插入一个新的元素。
+{% endnote %}
+
+3. **cloneNode**：插入相同的多个元素
+
+```js
+// 如果想在header中插入多个相同的元素，可以使用cloneNode方法
+header.append(message.cloneNode(true)); // 深度克隆，包括子元素
+```
+
+4. **before**：插入到该元素之前
+
+```js
+// 将message插入到header之前
+header.before(message); 
+```
+
+5. **after**：插入到该元素之后。
+
+```js
+// 将message插入到header之后
+header.after(message); 
+```
+
+6. `insertAdjacentHTML()`：将指定的文本解析为  `Element`元素，并将结果节点插入到 DOM 树中的指定位置。
+
+{% btn 
+'https://developer.mozilla.org/zh-CN/docs/Web/API/Element/insertAdjacentHTML',
+'MDN 文档',
+far fa-hand-point-right,blue larger 
+%}
+
+
+### 删除元素
+
+1. **remove**：自己删除自己
+
+```js
+// 删除元素
+document
+  .querySelector('.btn--close-cookie')
+  .addEventListener('click', function () {
+    message.remove();
+  });
+```
+
+2. **removeChild**：让父元素去删除
+
+```js
+// 删除元素
+document
+  .querySelector('.btn--close-cookie')
+  .addEventListener('click', function () {
+    message.parentElement.removeChild(message);
+  });
+```
+
+### 行内样式 Styles
+
+格式：`element.style.[具体属性]`
+
+> 不仅可以设置行内样式，还可以读取行内样式。
+
+```js
+const message = document.createElement('div'); 
+
+// 设置行内样式
+message.style.backgroundColor = '#37383d';
+message.style.width = '120%';
+
+// 只能获取内联样式，如果不存在这个行内样式，则返回空字符串
+console.log(message.style.backgroundColor); 
+console.log(message.style.width)
+```
+
+如果想获取css选择器设置的样式，怎么办？
+```js
+// 如果想获取通过css选择器设置的样式，需要使用getComputedStyle
+console.log(getComputedStyle(message).color);
+console.log(getComputedStyle(message).height);
+```
+
+### 控制css variables
+
+```js
+document.documentElement.style.setProperty('--color-primary', 'orangered');
+
+// 相当于
+:root {
+  --color-primary: orangered;
+}
+```
+
+### Attributes
+
+> src, alt, class, id 等等都是Attributes。
+> 这些属性都可以读，也可以写。
+
+比如：
+```html
+        <img
+          src="img/logo.png"
+          alt="Bankist logo"
+          class="nav__logo"
+          id="logo"
+          designer="akbar"            自定义属性 
+          data-version-number="3.0"   data attributes
+        />
+
+          <a class="nav__link nav__link--btn btn--show-modal" href="#">
+             Open account
+          </a
+```
+
+```js
+// Attributes
+const logo = document.querySelector('.nav__logo');
+console.log(logo.alt);
+console.log(logo.className);
+console.log(logo.src);                                     // 绝对路径
+console.log(logo.getAttribute('src'));                     // 相对路径
+console.log(logo.getAttribute('designer'));                // 自定义属性
+logo.setAttribute('company', 'Bankist');                   // 设置自定义属性
+console.log(logo.getAttribute('company'));
+console.log(logo.dataset.versionNumber)                    // 访问data-version-number属性
+
+const link = document.querySelector('.nav__link--btn')
+console.log(link.href);                                    // 绝对路径
+console.log(link.getAttribute('href'));                    // 相对路径
+```
+
+### 类名Class
+
+```html
+        <img
+          src="img/logo.png"
+          alt="Bankist logo"
+          class="nav__logo"
+          id="logo"
+          designer="akbar"            自定义属性 
+          data-version-number="3.0"   data attributes
+        />
+```
+
+```js
+const logo = document.querySelector('.nav__logo');
+
+logo.className = 'jonas'; // 不推荐， 会覆盖掉所有的类
+
+logo.classList.add('class1', 'class2');
+logo.classList.remove('class1');
+logo.classList.toggle('class2');    // 如果存在则删除，否则添加
+logo.classList.contains('class2'); // true
+```
 
 ## window.innerWidth
 
@@ -2096,133 +2384,6 @@ window.clearTimeout(myTimer);
 window.scrollTo(0, 500) // 滚动到垂直位置500px
 ```
 
-# DOM, Node, Element 之间的关系
-
-```txt
-DOM (Document Object Model)
-│
-└── Node（所有节点的基类）
-    ├── Document            document
-    ├── Element             div, span, a, p...
-    ├── Text                文本节点
-    ├── Comment             注释节点
-    ├── Attr                属性节点
-    └── ... etc
-```
-
-# Node
-
-Node 是 DOM 中的所有节点；
-
-Element 要继承 Node
-
-## 实例属性
-
-1. **textContent**：表示一个节点及其后代的文本内容。
-
-实例代码：
-
-```js
-document.querySelector('.message').textContent = 'Correct Number'
-```
-
-解释：
-
-```js
-document.querySelector('.message')
-    ↓ 返回的对象是 Element
-Element 继承自 Node
-    ↓
-所以可以使用 Node 的属性和方法
-```
-
-# Element
-
-**Element**  是最通用的基类，`Document`中的所有元素对象（即表示元素的对象）都继承自它。它只具有各种元素共有的方法和属性。
-
-## 实例属性
-
-1. **classList**：返回一个元素  `class`  属性的动态  `DOMTokenList`  集合。这可以用于操作 class 集合。
-
-```js
-// 使用 classList API 移除、添加类值
-div.classList.add('anotherclass')
-div.classList.remove('foo')
-
-// 如果 visible 类值已存在，则移除它，否则添加它
-div.classList.toggle('visible')
-
-// 将类值 "foo" 替换成 "bar"
-div.classList.replace('foo', 'bar')
-```
-
-2. `innerHTML`：设置或获取 HTML 语法表示的元素的后代。
-
-## 示例方法
-
-1. `insertAdjacentHTML()`：将指定的文本解析为  `Element`元素，并将结果节点插入到 DOM 树中的指定位置。
-
-# HTMLInputElement
-
-**`HTMLInputElement`**  接口提供了特定的属性和方法，用于管理  `<input>`元素的选项、布局和外观。
-
-MDN 链接：https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLInputElement
-
-![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251202211244636.png)
-
-1. **value**: current value of the [`<input>`] element as a string.
-
-> `<input>`、`<textarea>` 等 **可输入元素的内容并不是一个文本节点**，而是存储在它们的 **value 属性中**。
-> 为什么呢？
-> 因为 `<input>` 标签是**自闭合的**，没有内部文本节点：
-
-比如：
-
-```js
-document.querySelector('input').value = 'Hello' // 正确 ✔
-document.querySelector('input').textContent = 'Hello' // 无效 ❌
-```
-
-```js
-<input type="text" />   <!-- 没有像 <p>xxx</p> 那样的内容节点 -->
-```
-
-# EventTarget
-
-只要一个对象继承了 `EventTarget`，它就能使用 `addEventListener()`、`removeEventListener()`。
-
-```js
-EventTarget
-   ├── Node
-   │    ├── Element
-   │    │    ├── HTMLElement
-   │    │    │    ├── HTMLInputElement
-   │    │    │    ├── HTMLButtonElement
-   │    │    │    ├── ...各种元素
-   │    └── Document
-   └── Window
-```
-
-| 对象                          | 示例                             |
-| ----------------------------- | -------------------------------- |
-| `Element`                     | div, p, span, button, input…     |
-| `Document`                    | `document.addEventListener(...)` |
-| `Window`                      | `window.addEventListener(...)`   |
-| 其它继承 `EventTarget` 的对象 | 如自定义事件目标                 |
-
-# HTMLElement
-
-HTMLElement 接口表示所有的 HTML 元素。
-
-继承自父接口  `Element`。
-
-1. **style**：为元素的内联  `style`属性中定义的属性分配值。
-
-比如：
-
-```js
-document.body.style.backgroundColor = '#60b347'
-```
 
 # 为什么说 JavaScript 不是纯解释型语言？
 
@@ -2261,9 +2422,14 @@ V8 会做两件事：
 
 纯解释型语言不会做第 2 步，因此**现代 JS 就不是纯解释型语言了**。
 
-# 执行上下文 和 作用域链
+# `执行上下文` 和 `作用域链`
 
-[JavaScript 执行上下文、作用域与词法环境详解一、执行上下文（Execution Context） 定义： 执行 - 掘金](https://juejin.cn/post/7486429532720349199)
+{% btn 
+'https://juejin.cn/post/7486429532720349199',
+'掘金文档',
+far fa-hand-point-right,blue larger 
+%}
+
 
 # Math
 
