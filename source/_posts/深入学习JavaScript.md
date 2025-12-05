@@ -1816,11 +1816,9 @@ rest1.numGuests ??= 10 // rest1.numGuests 仍为 0（正确保留）
 rest2.numGuests ??= 10 // rest2.numGuests 赋值为 10（正确新增）
 ```
 
-# 事件参数
+# Event 事件
 
-## Event
-
-- **事件对象**：封装了事件发生时的具体信息（类型、时间戳、目标元素等）
+- **Event是事件对象**：封装了事件发生时的具体信息（类型、时间戳、目标元素等）
 - **传递**：当事件被触发时，Event 对象会作为参数传递给事件处理函数
 
 ```js
@@ -1842,6 +1840,207 @@ document.addEventListener('keyup', function (event) {
 
 > 上面的`event`就是事件参数。
 > 当这个事件被触发的时候，JavaScript 把事件对象作为参数给这个函数传进去，注意，我们自己没有调用这个函数，因为我们只是在这里声明了以下，由 JavaScript 来调用，并且传我们要求的参数`event`。
+
+## 常见的事件类型
+
+| 事件类型        | 说明                           |
+| --------------- | ------------------------------ |
+| `click`         | 鼠标点击事件                   |
+| `mouseenter`    | 鼠标进入事件                   |
+| `mouseleave`    | 鼠标离开事件                   |
+| `keyup`         | 键盘按键释放事件                |
+| `keydown`       | 键盘按键按下事件                |
+| `load`          | 页面或资源加载完成事件           |
+
+## 事件绑定
+
+```js
+const h1 = document.querySelector('h1');
+
+// 第一种绑定事件的方法(推荐)
+h1.addEventListener('mouseenter', function () {
+  window.alert('Hello from h1, you hovered the h1 element');
+});
+
+// 第二种绑定事件的方法(不推荐, 老的写法)
+h1.onmouseenter = function () {
+  window.alert('Hello from h1, you hovered the h1 element');
+};
+
+// 比如点击事件(不推荐， 老的写法)
+h1.onclick = function () {
+  window.alert('Hello from h1, you hovered the h1 element');
+};
+```
+
+## 如果想只执行一次事件处理函数
+
+```js
+const h1 = document.querySelector('h1');
+
+// 第一种绑定事件的方法
+const alertH1 = function () {
+  window.alert('Hello from h1, you hovered the h1 element');
+
+  // 移除事件监听器, 先执行上面的alert, 再移除监听器
+  h1.removeEventListener('mouseenter', alertH1);
+};
+
+h1.addEventListener('mouseenter', alertH1);
+```
+
+也可以这样写：
+```js
+const h1 = document.querySelector('h1');
+
+// 第一种绑定事件的方法
+const alertH1 = function () {
+  window.alert('Hello from h1, you hovered the h1 element');
+};
+
+h1.addEventListener('mouseenter', alertH1);
+window.setTimeout(() => h1.removeEventListener('mouseenter', alertH1), 3000);
+```
+
+## 事件冒泡
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251205105421125.png)
+
+事件冒泡（Event Bubbling）是指当一个事件被触发时，它会从最具体的元素（事件目标）开始，逐级向上传播到其父元素，直到到达最顶层的 DOM 树。
+
+事件冒泡有三个阶段：
+1. 捕获阶段（Capturing Phase）：事件从根节点向下传播到目标元素的路径上。
+2. 目标阶段（Target Phase）：事件到达目标元素并触发事件处理程序。
+3. 冒泡阶段（Bubbling Phase）：事件从目标元素向上传播回根节点的路径上。
+
+默认情况下，事件处理程序会在冒泡阶段被调用。
+如果想在捕获阶段处理事件，可以在添加事件监听器时传递第三个参数`true`。
+
+
+html解构：
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251205133219889.png)
+
+**示例代码**：
+```js
+const randomInt = (min, max) => Math.trunc(Math.random() * (max - min + 1) + min);
+
+const randomColor = () => `rgb(${randomInt(0, 255)}, ${randomInt(0, 255)}, ${randomInt(0, 255)})`;
+
+document.querySelector('.nav__link').addEventListener('click', function (e) {
+  // this 指向当前绑定事件的元素
+  this.style.backgroundColor = randomColor();
+  console.log('LINK', e.target, e.currentTarget);
+  // e.currentTarget 指向当前绑定事件的元素
+  // e.target 指向实际触发事件的元素
+  console.log(this === e.currentTarget);  // true
+});
+
+document.querySelector('.nav__links').addEventListener('click', function (e) {
+  this.style.backgroundColor = randomColor();
+  console.log('CONTAINER', e.target, e.currentTarget);
+});
+
+document.querySelector('.nav').addEventListener('click', function (e) {
+  this.style.backgroundColor = randomColor();
+  console.log('NAV', e.target, e.currentTarget);
+});
+```
+
+**怎么阻止事件冒泡**：
+
+{% codeblock lang:javascript mark:13,14 %}
+const randomInt = (min, max) => Math.trunc(Math.random() * (max - min + 1) + min);
+
+const randomColor = () => `rgb(${randomInt(0, 255)}, ${randomInt(0, 255)}, ${randomInt(0, 255)})`;
+
+document.querySelector('.nav__link').addEventListener('click', function (e) {
+  // this 指向当前绑定事件的元素
+  this.style.backgroundColor = randomColor();
+  console.log('LINK', e.target, e.currentTarget);
+  // e.currentTarget 指向当前绑定事件的元素
+  // e.target 指向实际触发事件的元素
+  console.log(this === e.currentTarget); // true
+
+  // 阻止事件冒泡, 阻止事件传播到更外层的元素
+  e.stopPropagation();
+});
+
+document.querySelector('.nav__links').addEventListener('click', function (e) {
+  this.style.backgroundColor = randomColor();
+  console.log('CONTAINER', e.target, e.currentTarget);
+});
+
+document.querySelector('.nav').addEventListener('click', function (e) {
+  this.style.backgroundColor = randomColor();
+  console.log('NAV', e.target, e.currentTarget);
+});
+{% endcodeblock %}
+
+## 事件委托
+
+事件委托（Event Delegation）是一种常用的事件处理模式，通过将事件监听器添加到父元素上，而不是每个子元素上，从而利用事件冒泡机制来处理子元素的事件。
+
+**原理**：
+浏览器在执行事件时，默认会先在最具体的目标元素上触发（target 阶段），然后事件会沿着 DOM 树向上冒泡，经过每个祖先元素，直到根节点。因此在父元素上注册点击监听器，会接收到子元素触发并冒泡上来的事件。
+
+示例代码：
+
+html解构：
+```html
+<ul class="nav__links">
+          <li class="nav__item">
+            <a class="nav__link" href="#section--1">Features</a>
+          </li>
+          <li class="nav__item">
+            <a class="nav__link" href="#section--2">Operations</a>
+          </li>
+          <li class="nav__item">
+            <a class="nav__link" href="#section--3">Testimonials</a>
+          </li>
+          <li class="nav__item">
+            <a class="nav__link nav__link--btn btn--show-modal" href="#"
+              >Open account</a
+            >
+          </li>
+</ul>
+
+<!--  要跳转的section是这样的 -->
+  <section class="section" id="section--1"></section>
+  <section class="section" id="section--2"></section>
+```
+
+我们的目标是点击导航栏的链接时，页面平滑滚动到对应的 section。
+
+```js
+// 效率较低的做法
+// document.querySelectorAll('.nav__link').forEach(function (el) {
+//   el.addEventListener('click', function (event) {
+//     event.preventDefault();                // 阻止a标签的默认跳转行为
+//     const id = this.getAttribute('href');  // 获取链接的目标id(相对路径， 如 #section--1)
+//     document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+//   });
+// });
+
+// 高效的做法： 事件委托
+// 1. 在共同的父元素上添加事件监听器
+// 2. 利用事件对象event，确定事件的目标元素
+/**
+ * 原理：
+ * 浏览器在执行事件时，默认会先在最具体的目标元素上触发（target 阶段），
+ * 然后事件会沿着 DOM 树向上冒泡，经过每个祖先元素，直到根节点。
+ * 因此在父元素上注册点击监听器，会接收到子元素触发并冒泡上来的事件。
+ */
+document
+  .querySelector('.nav__links')
+  .addEventListener('click', function (event) {
+    event.preventDefault();
+
+    if (event.target.classList.contains('nav__link') && event.target.getAttribute('href') !== '#') {
+      const id = event.target.getAttribute('href');
+      document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+```
 
 # window
 
@@ -2231,6 +2430,34 @@ logo.classList.toggle('class2');    // 如果存在则删除，否则添加
 logo.classList.contains('class2'); // true
 ```
 
+### getBoundingClientRect()
+
+其提供了元素的大小及其相对于视口的位置。
+这里的Rect是Rectangle的意思。
+
+{% btn 
+'https://developer.mozilla.org/zh-CN/docs/Web/API/Element/getBoundingClientRect',
+'MDN 文档',
+far fa-hand-point-right,blue larger 
+%}
+
+### clientWidth 和 clientHeight
+
+返回元素的可见宽高（内容 + 内边距，不包括边框、滚动条、外边距）。
+
+{% btn 
+'https://developer.mozilla.org/zh-CN/docs/Web/API/Element/clientWidth',
+'MDN ClientWidth 文档',
+far fa-hand-point-right,blue larger 
+%}
+
+{% btn 
+'https://developer.mozilla.org/zh-CN/docs/Web/API/Element/clientHeight',
+'MDN ClientHeight 文档',
+far fa-hand-point-right,blue larger 
+%}
+
+
 ## window.innerWidth
 
 获取浏览器窗口的宽高。
@@ -2380,9 +2607,66 @@ window.clearTimeout(myTimer);
 
 滚动窗口到指定位置
 
+参数：
+- x-coord：水平像素值
+- y-coord：垂直像素值
+- behavior（可选）：滚动行为，`'auto'`（默认）或`'smooth'`
+
+{% note warning flat %}
+**注意**
+x-coord 和 y-coord 是相对于文档左上角的坐标，而不是相对于当前视口的位置。
+{% endnote %}
+
+示例代码：
 ```js
-window.scrollTo(0, 500) // 滚动到垂直位置500px
+// Scrolling
+const btnScrollTo = document.querySelector('.btn--scroll-to');
+const section1 = document.querySelector('#section--1');
+
+btnScrollTo.addEventListener('click', function () {
+  const s1coords = section1.getBoundingClientRect();
+  // 相对于视口的信息
+  console.log(s1coords);
+
+  window.scrollTo({
+    left: s1coords.left + window.scrollX,
+    top: s1coords.top + window.scrollY,
+    behavior: 'smooth',
+  });
+});
 ```
+
+但是还有更简单的方法😁，推荐使用`scrollIntoView()`方法。
+```js
+// Scrolling
+const btnScrollTo = document.querySelector('.btn--scroll-to');
+const section1 = document.querySelector('#section--1');
+
+btnScrollTo.addEventListener('click', function () {
+  section1.scrollIntoView({ behavior: 'smooth' });
+});
+```
+
+## window.scrollX 和 window.scrollY
+
+返回文档在水平方向和垂直方向已滚动的像素值。
+
+{% note warning flat %}
+**注意**
+scrollX 和 scrollY 返回的是相对于文档左上角的坐标，而不是相对于当前视口的位置。
+{% endnote %}
+
+{% btn 
+'https://developer.mozilla.org/zh-CN/docs/Web/API/Window/scrollX',
+'MDN ScrollX 文档',
+far fa-hand-point-right,blue larger 
+%}
+
+{% btn 
+'https://developer.mozilla.org/zh-CN/docs/Web/API/Window/scrollY',
+'MDN ScrollY 文档',
+far fa-hand-point-right,blue larger 
+%}
 
 
 # 为什么说 JavaScript 不是纯解释型语言？
@@ -2557,3 +2841,358 @@ far fa-hand-point-right,blue larger
 # this 关键字
 
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251202210422015.png)
+
+# 面向对象
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251205154030603.png)
+
+**面向对象的几个元素**：
+- 抽象（Abstraction）
+- 封装（Encapsulation）
+- 继承（Inheritance）
+- 多态（Polymorphism）
+
+## JavaScript中的面向对象
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251205155904569.png)
+
+**JavaScript中如何创建`prototype`**？
+- 使用构造函数（Constructor Functions）
+- 使用`Object.create()`
+- 使用 ES6 的`class`语法糖：背后还是基于原型的继承机制、构造函数创建。
+
+## 构造函数
+
+> 构造函数和其它函数没什么不一样的，但是构造函数我们可以使用`new`关键字来调用它。
+> 不要用`箭头函数`来定义构造函数，因为箭头函数没有自己的`this`。
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251205171531632.png)
+
+**原型链：**
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251205172131457.png)
+
+```js
+const Person = function(firstName, birthYear) {
+  // Instance properties, available on all instances
+  this.firstName = firstName;
+  this.birthYear = birthYear;
+}
+
+const akbar = new Person('Akbar',2001)
+```
+
+构造流程（当你执行 `new Person(...)` 时）：
+  - 创建一个空对象 `{}`。
+  - 将函数 `Person` 内的 `this` 绑定到这个新对象。
+  - 新对象会被自动链接到构造函数的 `prototype`（即新对象的 `__proto__` 指向 `Person.prototype`）。
+  - 函数执行完毕后，默认返回这个新对象。
+
+---
+
+```js
+const Person = function(firstName, birthYear) {
+  // Instance properties, available on all instances
+  this.firstName = firstName;
+  this.birthYear = birthYear;
+}
+
+const akbar = new Person('Akbar',2001)
+
+console.log(akbar instanceof Person)
+```
+**`instanceof`**：
+  - `akbar instanceof Person` → true，因为 `Person.prototype` 在 `akbar` 的原型链上。`akbar.__proto__ === Person.prototype`。
+
+--- 
+```js
+const Person = function(firstName, birthYear) {
+  // Instance properties, available on all instances
+  this.firstName = firstName;
+  this.birthYear = birthYear;
+
+  // Never create methods inside constructor functions
+  // because it will create a new copy of the method for every object
+  // this.calcAge = function() {
+  //   console.log(2025 - this.birthYear);
+  // }
+}
+
+// 要这样写
+Person.prototype.calcAge = function() {
+  console.log(2025 - this.birthYear);
+}
+
+// 调用calcAge方法
+akbar.calcAge()
+```
+**最佳实践小结**：
+
+  - 不要在构造函数内部为每个实例创建方法（会造成每个实例持有独立函数）。
+  - 需要共享行为时，把方法放到 `Constructor.prototype` 或者使用 ES6 `class`（本质上仍是基于原型）。
+  - 如果要创建没有原型链的对象、或做更细的继承控制，可考虑 `Object.create()`。
+---
+
+```js
+const Person = function(firstName, birthYear) {
+  this.firstName = firstName;
+  this.birthYear = birthYear;
+}
+
+Person.prototype.species = 'Homo Sapiens'
+
+console.log(akbar.hasOwnProperty('firstName'))
+console.log(akbar.hasOwnProperty('species'))
+```
+**`hasOwnProperty` vs 继承属性`**：
+
+  - `akbar.hasOwnProperty('firstName')` 为 `true`（实例自身的属性）。
+  - `akbar.hasOwnProperty('species')` 为 `false`，因为 `species` 在原型上，是继承来的。
+
+**原型链查找**：
+
+  - 当你访问 `akbar.calcAge()` 时，JavaScript 先在 akbar 对象自身查找；找不到就沿着 `__proto__`（即 `Person.prototype`）查找；找到则调用。
+
+### 有趣的示例代码
+
+> 我想扩展Array.prototype
+
+```js
+const arr = [1,1,1, 3,3,3, 4,4,5]
+
+Array.prototype.unique = function() {
+  return [...new Set(this)]
+}
+
+console.log(arr.unique())  // 输出：[1, 3, 4, 5]
+```
+
+{% note warning modern %}
+**提示**
+但是不推荐这么做。
+{% endnote %}
+
+### 挑战
+
+1. Use a constructor function to implement a Car. A car has a make and a speed property. The speed property is the current speed of the car in km/h;
+2. Implement an 'accelerate' method that will increase the car's speed by 10, and log the new speed to the console;
+3. Implement a 'brake' method that will decrease the car's speed by 5, and log the new speed to the console;
+4. Create 2 car objects and experiment with calling 'accelerate' and 'brake' multiple times on each of them.
+
+DATA CAR 1: 'BMW' going at 120 km/h
+DATA CAR 2: 'Mercedes' going at 95 km/h
+
+GOOD LUCK 😀
+
+```js
+const Car = function(make, speed) {
+  this.make = make;
+  this.speed = speed;
+}
+
+Car.prototype.accelerate = function() {
+  this.speed += 10;
+  console.log(`${this.make} is going at ${this.speed} km/h`);
+}
+
+Car.prototype.brake = function() {
+  this.speed -= 5;
+  console.log(`${this.make} is going at ${this.speed} km/h`);
+}
+
+const bmw = new Car('BMW', 120);
+const mercedes = new Car('Mercedes', 95);
+
+bmw.accelerate(); 
+bmw.brake(); 
+
+mercedes.accelerate();
+mercedes.brake();
+```
+
+## ES6 Classes
+
+> class 其实一种特殊的函数，是构造函数的语法糖。
+
+有两种定义 class 的方式：
+```js
+// class expression
+const Animal = class {
+
+}
+
+// class declaration
+class Person {
+
+}
+```
+
+示例代码：
+```js
+class Person {
+  constructor(firstName, birthYear) {
+    this.firstName = firstName;
+    this.birthYear = birthYear;
+  }
+
+  calcAge() {
+    console.log(2025 - this.birthYear);
+  }
+}
+
+const akbar = new Person('Akbar', 2001);
+
+console.log(akbar);
+akbar.calcAge();
+
+console.log(akbar instanceof Person);
+console.log(akbar.__proto__ === Person.prototype);
+
+
+// 手动添加方法
+Person.prototype.greet = function () {
+  console.log(`Hello, my name is ${this.firstName}`);
+}
+akbar.greet();
+```
+
+### 注意事项
+
+1. Class 没有提升（hoisting），必须在声明后才能使用。
+2. Class 是一等公民，因为它是一种特殊的函数。
+3. Class 内部遵循严格模式（'use strict'）。
+
+## Setters 和 Getters
+
+getter和setter是JavaScript类中用于访问和修改对象属性的特殊方法，它们让你能够更好地控制属性的读写操作。
+
+比如：
+```js
+const account = {
+  owner: 'akbar',
+  movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
+
+  get latest() {
+    return this.movements.slice(-1)[0];
+  },
+
+  set latest(mov) {
+    this.movements.push(mov);
+  },
+};
+
+// 使用 getter
+console.log(account.latest);
+// 使用 setter
+account.latest = 50;
+console.log(account.movements);
+```
+
+**class也可以使用getter和setter**：
+
+```js
+class Person {
+  constructor(name, age) {
+    this._name = name;  // 使用下划线表示私有属性
+    this._age = age;
+  }
+  
+  // getter方法
+  get name() {
+    return this._name;
+  }
+  
+  get age() {
+    return this._age;
+  }
+  
+  // setter方法
+  set name(newName) {
+    if (newName.length > 0) {
+      this._name = newName;
+    }
+  }
+  
+  set age(newAge) {
+    if (newAge >= 0 && newAge <= 150) {
+      this._age = newAge;
+    }
+  }
+}
+
+const person = new Person('张三', 25);
+console.log(person.name);  // 使用getter，输出: 张三
+person.name = '李四';      // 使用setter
+console.log(person.name);  // 输出: 李四
+```
+
+## Static
+
+static关键字用于定义类的静态方法或静态属性，它们属于类本身而不是类的实例。
+
+比如：`Array.from()`, `Number.parseInt()`等。只能通过类本身调用，不能通过实例调用，因为这些属性和方法只属于类，而不是属于示例。
+
+```js
+class Person {
+  constructor(name, age) {
+    this._name = name;  
+    this._age = age;
+  }
+  
+  // getter方法
+  get name() {
+    return this._name;
+  }
+  
+  get age() {
+    return this._age;
+  }
+  
+  // setter方法
+  set name(newName) {
+    if (newName.length > 0) {
+      this._name = newName;
+    }
+  }
+  
+  set age(newAge) {
+    if (newAge >= 0 && newAge <= 150) {
+      this._age = newAge;
+    }
+  }
+}
+
+// 创建静态方法
+Person.hey = function() {
+  console.log('Hey there!');
+  console.log(this);  // 指向Person类本身, 因为Person调用这个方法
+}
+
+const person = new Person('张三', 25);
+
+console.log(person.hey) // undefined
+Person.hey() // Hey there!
+```
+
+## Object.create()
+
+`Object.create()`方法创建一个新对象，使用现有的对象来提供新创建的对象的`__proto__`。
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251205204715659.png)
+
+比如：
+```js
+const PersonProto = {
+  calcAge() {
+    // 这里的 this 指向调用该方法的对象
+    console.log(2025 - this.birthYear);
+  }
+}
+
+const akbar = Object.create(PersonProto)
+
+akbar.birthYear = 1998;
+akbar.calcAge();
+console.log(akbar);
+
+console.log(akbar.__proto__ === PersonProto)  // true
+```
