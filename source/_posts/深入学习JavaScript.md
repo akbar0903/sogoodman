@@ -612,6 +612,20 @@ console.log(akbar['calcAge']())
 
 > 这里 this 指向的是当前方法的调用者。
 
+**对象转换成字符串**：
+
+我们可以使用`JSON.stringify()`方法把对象转换成字符串：
+
+```js
+const akbar = {
+  name: 'akbar',
+  job: 'noJob',
+  birthYear: 2001,
+}
+
+console.log(JSON.stringify(akbar))
+```
+
 **对象增强写法**
 
 1. **属性名相同，可以只写一个：**
@@ -654,6 +668,8 @@ const akbar = {
 console.log(akbar)
 akbar.printAge()
 ```
+
+
 
 ### Sets
 
@@ -1851,6 +1867,8 @@ document.addEventListener('keyup', function (event) {
 | `keyup`         | 键盘按键释放事件                |
 | `keydown`       | 键盘按键按下事件                |
 | `load`          | 页面或资源加载完成事件           |
+| `submit`        | 表单提交事件                   |
+| `error`         | 发生错误时触发的事件             |
 
 ## 事件绑定
 
@@ -2457,6 +2475,16 @@ far fa-hand-point-right,blue larger
 far fa-hand-point-right,blue larger 
 %}
 
+### focus()元素聚焦
+
+input元素获取焦点
+
+```js
+const inputDistance = document.querySelector('.form__input--distance');
+
+inputDistance.focus();
+```
+
 
 ## window.innerWidth
 
@@ -2467,6 +2495,11 @@ far fa-hand-point-right,blue larger
 获取浏览器窗口的内容区域的高度，包括（已渲染的）水平滚动条。
 
 ## window.localStorage
+
+{% note warning flat %}
+**注意**
+localstorage操作会阻塞主线程，尤其是在存储大量数据时。
+{% endnote %}
 
 ### 实例方法
 
@@ -2555,6 +2588,8 @@ window.setInterval()返回的值可以用来传递给  `clearInterval()`来清�
 ## window.setTimeout()
 
 设置一个定时器，一旦定时器到期，就会执行一个函数或指定的代码片段。
+
+定时器属于宏任务。
 
 {% btn 
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Window/setTimeout',
@@ -2667,6 +2702,20 @@ far fa-hand-point-right,blue larger
 'MDN ScrollY 文档',
 far fa-hand-point-right,blue larger 
 %}
+
+## window.navigator
+
+可以用于请求运行当前代码的应用程序的相关信息。
+
+1. **navigator.geolocation.getCurrentPosition()**：获取用户的当前位置。
+
+语法：
+```js
+getCurrentPosition(success)                 // success 回调函数
+getCurrentPosition(success, error)          // success 是成功回调， error 是失败回调
+getCurrentPosition(success, error, options) // options 可选参数
+```
+
 
 
 # 为什么说 JavaScript 不是纯解释型语言？
@@ -2841,6 +2890,43 @@ far fa-hand-point-right,blue larger
 # this 关键字
 
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251202210422015.png)
+
+## function.call()方法
+
+{% btn 
+'https://www.bilibili.com/video/BV1vA4y197C7?spm_id_from=333.788.videopod.episodes&vd_source=28e37be50df53ebbf04edfcc6228018f&p=124',
+'B站视频',
+far fa-hand-point-right,blue larger 
+%}
+
+{% btn 
+'https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/call',
+'MDN 文档',
+far fa-hand-point-right,blue larger 
+%}
+
+## function.bind()方法
+
+`function.bind()` 方法创建一个新的函数，在 `bind()` 被调用时，这个新函数的 `this` 被指定为传入的第一个参数。
+
+比如：
+
+```js
+const person = {
+  firstName: 'Akbar',
+  greet: function() {
+    console.log(`Hello, my name is ${this.firstName}`);
+  }
+};
+
+const akbar = person.greet;
+akbar(); // 输出: Hello, my name is undefined
+
+// 使用 bind 方法将 this 绑定到 person 对象
+const boundGreet = akbar.bind(person);
+boundGreet(); // 输出: Hello, my name is Akbar
+```
+
 
 # 面向对象
 
@@ -3182,6 +3268,13 @@ Person.hey() // Hey there!
 比如：
 ```js
 const PersonProto = {
+
+  // 初始化方法, 相当于类的构造函数
+  init(firstName, birthYear) {
+    this.firstName = firstName;
+    this.birthYear = birthYear;
+  },
+
   calcAge() {
     // 这里的 this 指向调用该方法的对象
     console.log(2025 - this.birthYear);
@@ -3190,9 +3283,677 @@ const PersonProto = {
 
 const akbar = Object.create(PersonProto)
 
-akbar.birthYear = 1998;
+akbar.init('Akbar', 1998);
 akbar.calcAge();
 console.log(akbar);
 
 console.log(akbar.__proto__ === PersonProto)  // true
 ```
+
+## 继承
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251206105621598.png)
+
+### 通过构造函数实现继承
+
+```js
+const Person = function (firstName, birthYear) {
+  this.firstName = firstName;
+  this.birthYear = birthYear;
+};
+
+Person.prototype.calcAge = function () {
+  console.log(2025 - this.birthYear);
+};
+
+const Student = function (firstName, birthYear, course) {
+  Person.call(this, firstName, birthYear);
+  this.course = course;
+};
+
+// Linking prototypes
+// 注意顺序：必须在定义 Student.prototype.introduce 之前
+Student.prototype = Object.create(Person.prototype)
+
+Student.prototype.introduce = function () {
+  console.log(`My name is ${this.firstName} and I study ${this.course}`);
+};
+
+// Correct the constructor pointer because it points to Person
+Student.prototype.constructor = Student;
+
+const mike = new Student('Mike', 2020, 'Computer Science');
+console.log(mike);
+mike.introduce();
+mike.calcAge();
+```
+
+### 通过 ES6 class 实现继承
+
+```js
+class Person {
+  constructor(fullName, birthYear) {
+    this.name = fullName;
+    this.birthYear = birthYear;
+  }
+
+  calcAge() {
+    const age = 2025 - this.birthYear;
+    console.log(`${this.name} is ${age} years old.`);
+  }
+}
+
+class Student extends Person {
+  constructor(fullName, birthYear, course) {
+    // Call the parent class constructor
+    super(fullName, birthYear);
+    this.course = course;
+  }
+
+  // 重写calcAge方法
+  calcAge() {
+    const age = 2025 - this.birthYear;
+    console.log(
+      `${this.name} is ${age} years old., and is studying ${this.course}.`
+    );
+  }
+
+  introduce() {
+    console.log(`My name is ${this.name} and I study ${this.course}.`);
+  }
+}
+
+const student1 = new Student('Alice Johnson', 2000, 'Computer Science');
+student1.introduce();
+student1.calcAge();
+```
+
+## 最后总结
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251206153513853.png)
+
+# `JSON` 命名空间
+
+{% note primary modern %}
+`JSON` 命名空间包含用于解析和生成 JSON 数据的功能。
+{% endnote %}
+
+## JSON.parse()
+
+将 JSON 字符串转换为 JavaScript 对象。
+
+```js
+const jsonString = '{"name": "Akbar", "age": 24, "isStudent": false}';
+const jsonObj = JSON.parse(jsonString);
+console.log(jsonObj);
+```
+
+## JSON.stringify()
+将 JavaScript 对象转换为 JSON 字符串。
+
+```js
+const jsonObj = { name: 'Akbar', age: 24, isStudent: false };
+const jsonString = JSON.stringify(jsonObj);
+console.log(jsonString);
+```
+
+# Object 命名空间
+
+{% note primary modern %}
+`Object`是JavaScript的引用数据类型。
+`Object` 命名空间包含用于操作对象的各种方法和属性。
+{% endnote %}
+
+## Object.keys()
+返回一个包含对象所有可枚举属性名称的数组。
+
+```js
+const obj = { name: 'Akbar', age: 24, isStudent: false };
+const keys = Object.keys(obj);
+console.log(keys);
+
+// 输出： ['name', 'age', 'isStudent']
+```
+
+# Asynchronous JavaScript
+
+## 什么是Synchronous JavaScript？
+
+同步 JavaScript 是指代码按顺序执行，一行接一行，直到所有代码执行完毕。在同步执行中，后续代码必须等待前面的代码执行完成后才能继续执行。这种方式简单直观，但在处理耗时操作（如网络请求、文件读取等）时，可能会导致阻塞，影响用户体验。
+
+比如看下面的代码：
+
+```diff
+const p = document.querySelector('p');
+p.textContent = 'Hello World!';
+- alert('This is an alert box!'); // 这里会阻塞后续代码的执行，直到用户关闭弹窗
+p.style.color = 'red';
+```
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251208143704074.png)
+
+## 什么是Asynchronous JavaScript？
+
+异步 JavaScript 是指代码可以在不阻塞主线程的情况下执行。异步操作允许程序在等待某些任务完成（如网络请求、定时器等）时，继续执行其他代码，从而提高应用的响应性和性能。异步编程通常使用回调函数、Promises 或 async/await 来处理异步操作的结果。
+
+比如看下面的代码：
+
+```diff
+const p = document.querySelector('p');
++ setTimeout(() => {                // 这里是异步操作
++   p.textContent = 'Hello World!';
++ }, 5000);                         // 2秒后更新文本内容
+p.style.color = 'red'; // 立即执行，不会被阻塞
+```
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251208144318601.png)
+
+有些操作自动就是异步的，比如：
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251208144613389.png)
+
+```js
+const img = document.querySelector('img');
+img.src = 'large-image.jpg'; // 加载大图是异步的
+img.addEventListener('load', function() {
+  console.log('Image loaded!');
+});
+p.style.border = '2px solid black'; // 立即执行
+```
+
+## AJAX
+
+AJAX（Asynchronous JavaScript and XML）是一种用于在不重新加载整个网页的情况下与服务器异步通信的技术。它允许网页在后台与服务器进行通信，从而实现更动态和交互式的用户体验。
+
+虽然是叫`XML`，但现在大多数情况下我们使用`JSON`作为数据交换格式。
+
+### XMLHttpRequest 对象
+
+`XMLHttpRequest` 对象是用于在浏览器中与服务器进行异步通信的核心 API。它允许你发送 HTTP 请求并接收响应，而无需刷新整个页面。
+
+但是现在更推荐使用 Fetch API 来进行异步请求，因为它更现代化，使用起来也更简洁。
+
+{% btn
+ 'https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest',
+ 'MDN 文档',
+ far fa-hand-point-right,blue larger 
+%}
+
+比如：
+```js
+  const request = new XMLHttpRequest();
+  request.open('GET', `https://restcountries.com/v3.1/name/${name}`);
+  request.send(); // 发送请求，但不会阻塞代码运行，因为这个操作在后台进行。
+  // 所以不能简单接受请求发送后就立刻使用数据
+  // const response = request.send() // 不能这样写, 因为异步操作的结果不能立刻获得
+
+  request.addEventListener('load', function () {
+    const [data] = JSON.parse(this.responseText);
+    console.log(data);
+  });
+```
+
+## Callback Hell(回调地狱)
+
+回调地狱是指在使用回调函数处理异步操作时，代码层层嵌套，导致代码难以阅读和维护的情况。
+比如，下一个操作依赖于上一个操作的结果，而上一个操作又是异步的，这样就会导致回调函数嵌套。
+
+比如：
+```js
+setTimeout(() => {
+  console.log('1 second passed');
+  setTimeout(() => {
+    console.log('2 seconds passed');
+    setTimeout(() => {
+      console.log('3 seconds passed');
+      setTimeout(() => {
+        console.log('4 seconds passed');
+      }, 1000);
+    }, 1000);
+  }, 1000);
+}, 1000);
+```
+
+又比如：
+```js
+const btn = document.querySelector('.btn-country');
+const countriesContainer = document.querySelector('.countries');
+
+const renderCountry = function (data, className = '') {
+  const html = `
+       <article class="country ${className}">
+          <img class="country__img" src="${data.flags.png}" />
+          <div class="country__data">
+            <h3 class="country__name">${data.name.common}</h3>
+            <h4 class="country__region">${data.region}</h4>
+            <p class="country__row"><span>👫</span>
+            ${(+data.population / 1000000).toFixed(1)}M people
+            </p>
+            <p class="country__row"><span>🗣️</span>${
+              data.languages[Object.keys(data.languages)[0]]
+            }</p>
+            <p class="country__row"><span>💰</span>${
+              data.currencies[Object.keys(data.currencies)[0]].name
+            }</p>
+          </div>
+        </article>`;
+
+  countriesContainer.insertAdjacentHTML('beforeend', html);
+  countriesContainer.style.opacity = 1;
+};
+
+// 回调地狱示例代码
+const getCountryAndNeighbor = function (name) {
+  // AJAX 1
+  const request = new XMLHttpRequest();
+  request.open('GET', `https://restcountries.com/v3.1/name/${name}`);
+  request.send();
+
+  request.addEventListener('load', function () {
+    const [data] = JSON.parse(this.responseText);
+    console.log(data);
+
+    // 渲染本国
+    renderCountry(data);
+
+    // 获取邻国
+    const [neighbor] = data.borders;
+    console.log(neighbor);
+    if (!neighbor) return;
+
+    // AJAX 2
+    const request2 = new XMLHttpRequest();
+    request2.open('GET', `https://restcountries.com/v3.1/alpha/${neighbor}`);
+    request2.send();
+
+    request2.addEventListener('load', function () {
+      const [data2] = JSON.parse(this.responseText);
+      console.log(data2);
+      renderCountry(data2, 'neighbour');
+
+      const [neighbor2] = data2.borders;
+      console.log(neighbor2);
+      if (!neighbor2) return;
+
+      // AJAX 3
+      const request3 = new XMLHttpRequest();
+      request3.open('GET', `https://restcountries.com/v3.1/alpha/${neighbor2}`);
+      request3.send();
+
+      request3.addEventListener('load', function () {
+        const [data3] = JSON.parse(this.responseText);
+        console.log(data3);
+        renderCountry(data3, 'neighbour');
+
+        const [neighbor3] = data3.borders;
+        console.log(neighbor3);
+        if (!neighbor3) return;
+
+        // AJAX 4
+        const request4 = new XMLHttpRequest();
+        request4.open(
+          'GET',
+          `https://restcountries.com/v3.1/alpha/${neighbor3}`
+        );
+        request4.send();
+        request4.addEventListener('load', function () {
+          const [data4] = JSON.parse(this.responseText);
+          console.log(data4);
+          renderCountry(data4, 'neighbour');
+
+          const [neighbor4] = data4.borders;
+          console.log(neighbor4);
+          if (!neighbor4) return;
+
+          // AJAX 5
+          const request5 = new XMLHttpRequest();
+          request5.open(
+            'GET',
+            `https://restcountries.com/v3.1/alpha/${neighbor4}`
+          );
+          request5.send();
+          request5.addEventListener('load', function () {
+            const [data5] = JSON.parse(this.responseText);
+            console.log(data5);
+            renderCountry(data5, 'neighbour');
+          });
+        });
+      });
+    });
+  });
+};
+
+// getCountryAndNeighbor('portugal');
+getCountryAndNeighbor('china');
+```
+
+## Promises
+
+Promise 是 JavaScript 中用于处理异步操作的一种机制。它表示一个可能在未来某个时间点完成或失败的操作，并允许你注册回调函数来处理这些结果。Promise 有三种状态：待定（pending）、已完成（fulfilled）和已拒绝（rejected）。
+
+Promise是属于微任务队列的。所以当主线程执行完同步代码后，会先去执行微任务队列中的任务，再去执行宏任务队列中的任务。
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251208163144529.png)
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251208163714981.png)
+
+### Consuming Promises
+
+如果你有一个返回 Promise 的函数，比如``fetch()` api，你可以使用 `.then()` 方法来处理成功的结果，使用 `.catch()` 方法来处理错误。
+
+```js
+const btn = document.querySelector('.btn-country');
+const countriesContainer = document.querySelector('.countries');
+
+const renderCountry = function (data, className = '') {
+  const html = `
+       <article class="country ${className}">
+          <img class="country__img" src="${data.flags.png}" />
+          <div class="country__data">
+            <h3 class="country__name">${data.name.common}</h3>
+            <h4 class="country__region">${data.region}</h4>
+            <p class="country__row"><span>👫</span>
+            ${(+data.population / 1000000).toFixed(1)}M people
+            </p>
+            <p class="country__row"><span>🗣️</span>${
+              data.languages[Object.keys(data.languages)[0]]
+            }</p>
+            <p class="country__row"><span>💰</span>${
+              data.currencies[Object.keys(data.currencies)[0]].name
+            }</p>
+          </div>
+        </article>`;
+
+  countriesContainer.insertAdjacentHTML('beforeend', html);
+  countriesContainer.style.opacity = 1;
+};
+
+// Consuming Promises
+const getCountryData = function (name) {
+  fetch(`https://restcountries.com/v3.1/name/${name}`)
+    .then(function (response) {
+      // 假设promise状态是fulfilled
+      console.log(response);
+      // 所有的response对象都有一个.json()方法, 这个方法也是异步的, 它同样会返回一个promise
+      // 因为json（）方法也是异步，我们接下来也返回一个promise
+      return response.json();
+    })
+    .then(function (data) {
+      console.log(data);
+      renderCountry(data[0]);
+    });
+};
+
+getCountryData('portugal');
+```
+
+**链式调用，下一个请求依赖上一个请求的结果：**
+
+```js
+const getCountryData = function (name) {
+  fetch(`https://restcountries.com/v3.1/name/${name}`)
+    .then(response => response.json())
+    .then(data => {
+      renderCountry(data[0]);
+      // console.log(data);
+      const neighbor = data[0].borders?.[0];
+      console.log(neighbor);
+      if (!neighbor) return;
+
+      // 获取邻国数据, 返回一个新的fetch的promise
+      return fetch(`https://restcountries.com/v3.1/alpha/${neighbor}`);
+    }) // 上面返回的promise，就是下面then的输入，比如下面的response
+    .then(response => response.json())
+    .then(data => renderCountry(data[0], 'neighbour'));
+};
+
+getCountryData('portugal');
+```
+
+**简单的处理错误**：
+```js
+const getCountryData = function (name) {
+  fetch(`https://restcountries.com/v3.1/name/${name}`)
+    .then(
+      response => response.json()
+      // err => window.alert(err) // 一个一个处理错误（不推荐）
+    )
+    .then(data => {
+      renderCountry(data[0]);
+      const neighbor = data[0].borders?.[0];
+      console.log(neighbor);
+      if (!neighbor) return;
+
+      return fetch(`https://restcountries.com/v3.1/alpha/${neighbor}`);
+    }) 
+    .then(response => response.json())
+    .then(data => renderCountry(data[0], 'neighbour'))
+  .catch(err => {   // catch会自动返回promise
+      // 一次性处理错误（推荐）
+      console.error(`${err} 💥💥`);
+      renderError(`Something went wrong 💥💥 ${err.message}. Try again!`);
+    })
+    .finally(() =>{
+      // 无论成功还是失败，都会执行
+    });
+};
+```
+
+**抛出错误**：
+```js
+// 显示错误
+const renderError = function (msg) {
+  countriesContainer.insertAdjacentText('beforeend', msg);
+};
+
+// 错误处理
+const getJson = function (url, errorMessage = 'Something went wrong') {
+  return fetch(url).then(response => {
+    if (!response.ok) throw new Error(`${errorMessage} (${response.status})`);
+
+    return response.json();
+  });
+};
+
+const getCountryData = function (name) {
+     getJson(`https://restcountries.com/v3.1/name/${name}`, 'Country not found')
+    .then(data => {
+      renderCountry(data[0]);
+      const neighbor = data[0].borders?.[0];
+
+      if (!neighbor) throw new Error('No neighbor found!');
+
+      return getJson(
+        `https://restcountries.com/v3.1/alpha/${neighbor}`,
+        'Country not found'
+      );
+    })
+    .then(data => renderCountry(data[0], 'neighbour'))
+    .catch(err => {
+      console.error(`${err} 💥💥`);
+      renderError(`Something went wrong 💥💥 ${err.message}. Try again!`);
+    })
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
+    });
+};
+
+btn.addEventListener('click', function () {
+  getCountryData('australia');
+});
+```
+
+
+### Building Promises
+
+你可以使用 `new Promise()` 来创建一个新的 Promise 对象。这个构造函数接受一个执行器函数作为参数，该函数包含两个参数：`resolve` 和 `reject`。当异步操作成功时，调用 `resolve`；当失败时，调用 `reject`。
+
+```js
+// 创建一个promise
+// 参数函数叫executor
+const lotteryPromise = new Promise(function (resolve, reject) {
+  console.log('Lottery draw is happening 🔮');
+
+  // 用定时器模拟异步操作, 否则就是同步操作
+  setTimeout(() => {
+    if (Math.random() >= 0.5) {
+      // fulfilled, 参数可以通过.then()访问
+      resolve('You WIN 💰');
+    } else {
+      // rejected, 参数可以通过.catch()访问
+      reject(new Error('You LOSE 💩'));
+    }
+  }, 2000);
+});
+
+// Consuming the promise
+lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
+console.log('---')
+```
+> 其实这段代码是同步和异步混合执行的，我们来一步步拆解：
+> 同步部分：new Promise(...) 构造函数本身以及传递给它的那个函数（executor function）是同步执行的。
+> 所以，当这段代码运行时，console.log('Lottery draw is happening 🔮') 会立刻被打印出来。
+> Math.random() 的计算和 if 判断也是立刻完成的，Promise 的状态（fulfilled 或 rejected）在这一步就已经决定了。
+> 异步部分：.then() 和 .catch() 里的回调函数是异步执行的。
+> 它们会被放入一个叫做“微任务”（microtask）的队列里，要等到当前所有同步代码（包括 console.log('---')）都执行完毕后，才会被调用。
+
+**Promisefy**：
+
+将基于回调的异步函数转换为返回 Promise 的函数。
+
+比如下面这是基于回调的异步函数：
+```js
+setTimeout(() => {
+  console.log('1 second passed');
+  setTimeout(() => {
+    console.log('2 seconds passed');
+    setTimeout(() => {
+      console.log('3 seconds passed');
+      setTimeout(() => {
+        console.log('4 seconds passed');
+      }, 1000);
+    }, 1000);
+  }, 1000);
+}, 1000);
+```
+
+你可以把它改写成返回 Promise 的函数：
+```js
+// Promisifying setTimeout
+const wait = function (seconds) {
+  // 不需要reject，因为定时器不会失败
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+wait(1)
+  .then(() => {
+    console.log('1 second passed');
+    return wait(1);
+  })
+  .then(() => {
+    console.log('2 seconds passed');
+    return wait(1);
+  })
+  .then(() => {
+    console.log('3 seconds passed');
+    return wait(1);
+  })
+  .then(() => console.log('4 seconds passed'));
+```
+
+**快速创建fullfilled或者rejected的Promise**：
+```js
+// Promise.resolve, 立刻执行并返回一个成功的promise
+Promise.resolve('abc').then(x => console.log(x));
+// Promise.reject, 立刻执行并返回一个失败的promise
+Promise.reject(new Error('Problem!')).catch(x => console.error(x));
+```
+
+**把callback base异步函数转化成Promise异步函数**：
+
+```js
+// callback base 异步获取地理位置
+window.navigator.geolocation.getCurrentPosition(
+  position => console.log(position),
+  err => console.error(err)
+);
+
+// Promise base 获取地理位置
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    window.navigator.geolocation.getCurrentPosition(
+      position => resolve(position),
+      err => reject(err)
+    );
+  });
+};
+
+getPosition()
+  .then(pos => console.log(pos))
+  .catch(err => console.error(err));
+```
+简化代码：
+```js
+position => resolve(position),
+err => reject(err)
+
+// 可以简化为：
+// resolve,
+// reject
+
+// 比如
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    window.navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+```
+
+## Async/Await
+
+`async` 和 `await` 是 JavaScript 中用于处理异步操作的关键字。它们使得异步代码看起来更像同步代码，从而提高了代码的可读性和可维护性。
+
+需要注意的是，这只是语法糖，底层依然是基于 Promise 实现的。比如，背后还是then(),catch()在起作用。
+
+```js
+const renderError = function (msg) {
+  countriesContainer.insertAdjacentText('beforeend', msg);
+};
+
+// Async / Await
+// 用async声明这个函数是异步的
+const getCountryData = async function (country) {
+  try {
+    // await 等待这个promise完成，所以我们可以拿到异步操作后的结果
+    const response = await fetch(
+      `https://restcountries.com/v3.1/name/${country}`
+    );
+
+    if (!response.ok) throw new Error(`Country not found (${response.status})`);
+
+    // 解析json也是异步的，所以也要await
+    const [data] = await response.json();
+    renderCountry(data);
+  } catch (err) {
+    console.error(`${err} 💥💥`);
+    renderError(`Something went wrong 💥💥 ${err.message}. Try again!`);
+  } finally {
+    countriesContainer.style.opacity = 1;
+  }
+};
+
+btn.addEventListener('click', function () {
+  getCountryData('germany');
+});
+```
+
+
+# PUBLIC API
+
+{% btn
+ 'https://github.com/public-apis/public-apis',
+ 'Public APIs 列表(GitHub)',
+ far fa-hand-point-right,blue larger 
+%}
+
+1. **获取国家信息**：搜索`REST Countries`
