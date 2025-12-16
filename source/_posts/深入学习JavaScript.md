@@ -317,12 +317,11 @@ console.log(friends.includes('Bob'))
 
 8. `concat()`：合并两个数组，然后返回一个新数组
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat',
 'MDN 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
-
 
 ```js
 const array1 = ['a', 'b', 'c']
@@ -372,6 +371,34 @@ console.log(arr)
 // 删除最后一个元素
 arr.splice(-1)
 console.log(arr)
+```
+
+在 vue 中使用：
+
+```html
+<ul>
+  <li v-for="(item, index) in items" :key="index">
+    {{ item }}
+    <button @click="removeItem(index)">Remove</button>
+  </li>
+</ul>
+```
+
+```js
+Vue.createApp({
+  data() {
+    return {
+      items: [],
+    }
+  },
+
+  methods: {
+    removeItem(index) {
+      // 从数组下标 index 开始删除 1 个元素
+      this.items.splice(index, 1)
+    },
+  },
+}).mount('#app')
 ```
 
 12. `reverse()`：就地反转数组中的元素，并返回同一数组的引用。数组的第一个元素会变成最后一个，数组的最后一个元素变成第一个。换句话说，数组中的元素顺序将被翻转，变为与之前相反的方向。
@@ -669,8 +696,6 @@ console.log(akbar)
 akbar.printAge()
 ```
 
-
-
 ### Sets
 
 `Set`  对象是值的合集（collection）。集合（set）中的元素**只会出现一次**，即集合中的元素是唯一的。
@@ -772,6 +797,123 @@ console.log(rest)
 ## 数据结构使用建议
 
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251202210147042.png)
+
+# 原始类型和引用类型内存分析
+
+## 原始类型的内存分析
+
+原始类型存储在栈内存（Stack）中， 变量存储的是实际的值，而不是引用。
+
+```js
+let a = 10 // 在栈内存中存储值10
+a = 20 // 改变a的值为20，只是改变值，不改变内存地址
+let b = a // b存储的是a的值20，不是引用
+```
+
+## 引用类型
+
+引用类型存储在堆内存（Heap）中， 变量存储的是对象的引用地址，而不是实际的值。
+
+```js
+const obj1 = { name: 'akbar' } // 在堆内存中创建对象，并将引用地址存储在obj1中
+const obj2 = obj1 // obj2存储的是obj1的引用地址
+obj2.name = 'sipul' // 通过obj2修改对象的属性，obj1也会受到影响
+```
+
+## 工程案例
+
+1. **在 vue 项目中经常的案例**：
+
+```js
+export default {
+  data() {
+    return {
+      storedResources: [
+        {
+          id: 'official-guide',
+          title: 'Official Guide',
+          description:
+            'The official Vue.js guide is a great resource to get started with Vue.js and learn about its core concepts and features.',
+          link: 'https://vuejs.org/',
+        },
+        {
+          id: 'google',
+          title: 'Google',
+          description:
+            'Google is a popular search engine that can help you find information on the web quickly and easily.',
+          link: 'https://www.google.com/',
+        },
+      ],
+    }
+  },
+
+  methods: {
+    removeResource(resourceId) {
+      /**
+       * 这里filter返回一个新的数组，然后把这个新的数组的引用地址赋值给storedResources，
+       * 所以原来的this.storedResources没有收到任何影响
+       * 造成的结果是，provide里面的resources引用地址没有变化
+       * 所以页面上依然能看到原来的资源列表
+       *
+       * 解决办法：不要把新的数组赋值给this.storedResources，而是直接在原来的数组上进行修改（就地修改）
+       */
+      this.storedResources = this.storedResources.filter(resource => resource.id !== resourceId)
+    },
+  },
+
+  provide() {
+    return {
+      // 还是原来的this.storedResources引用地址，没有收到任何影响
+      resources: this.storedResources,
+      removeResource: this.removeResource,
+    }
+  },
+}
+```
+
+解决办法：
+
+```js
+removeResource(resourceId) {
+  const index = this.storedResources.findIndex(resource => resource.id === resourceId)
+  if (index !== -1) {
+    // 直接在原来的数组上进行修改（就地修改）
+    this.storedResources.splice(index, 1)
+  }
+},
+```
+
+# 对象拷贝
+
+## 浅拷贝（Shallow Copy）
+
+浅拷贝是指创建一个新对象，这个新对象有着原始对象属性值的一份精确拷贝。如果属性是基本类型，拷贝的就是基本类型的值；如果属性是引用类型，拷贝的就是内存地址。
+
+1. **使用 Object.assign() 方法进行浅拷贝：**
+
+> `Object.assign()`一个或者多个源对象中所有可枚举的自有属性复制到目标对象，并返回修改后的目标对象。
+> 语法：`const returnedTarget = Object.assign(target, source);`
+
+```js
+const akbar = {
+  name: 'akbar',
+  age: 24,
+  family: {
+    father: 'sipul',
+    mother: 'siti',
+  },
+}
+
+const akbarShallowCopy = Object.assign({}, akbar)
+```
+
+akbarShallowCopy.family 存的还是原始对象的引用地址。
+
+1. **使用扩展运算符（Spread Operator）进行浅拷贝：**
+
+```js
+const akbarShallowCopy = { ...akbar }
+```
 
 # 声明变量的关键字
 
@@ -1214,6 +1356,16 @@ logger()
 
 ## 立即执行函数
 
+立即执行函数（IIFE - Immediately Invoked Function Expression）：
+
+```js
+;(function () {
+  console.log('This function runs once immediately!')
+})()
+```
+
+> 注意这里的分号`;`，因为如果前面没有分号的话，可能会报错。
+
 ## 函数调用其它函数
 
 ```js
@@ -1467,6 +1619,16 @@ movements.forEach(function (movement, index, array) {
 })
 ```
 
+## for-in 循环
+
+`for-in`循环主要用于遍历对象的可枚举属性（包括继承的属性）。它会遍历对象的所有可枚举属性的键（key）。
+
+{% btn
+'https://tutorial.javascript.ac.cn/javascript-enumerable-properties/',
+ '网友博客链接',
+ far fa-hand-point-right,blue
+larger %}
+
 # 可选链操作符
 
 ```js
@@ -1520,7 +1682,7 @@ user.sayHello?.()
 
 # 短路运算
 
-**短路`或运算||`**
+## 短路`或运算||`
 
 ```js
 // 短路运算符
@@ -1528,7 +1690,7 @@ user.sayHello?.()
 console.log(3 || 'akbar') // 输出：3
 ```
 
-> 如果第一个值，比如 3，那么直接就返回 3，不会再看后面呢`akbar`
+> 如果第一个值是真，比如 3，那么直接就返回 3，不会再看后面呢`akbar`
 
 猜猜下面的代码输出什么？
 
@@ -1539,14 +1701,14 @@ console.log(undefined || null)
 console.log(undefined || 0 || '' || null || 'hello' || 25)
 ```
 
-**短路`与运算&&`**
+## 短路`与运算&&`
 
 ```js
 console.log(0 && 'akbar') // 输出0
 console.log(25 && 'akbar') // 输出 akbar
 ```
 
-只有第一个真的时候，才返回第二个。如果第一个假，就不会看第二个，直接返回第一个。
+> 只有第一个真的时候，才返回第二个。如果第一个假，就不会看第二个，直接返回第一个。
 
 猜猜下面的代码输出什么？
 
@@ -1712,7 +1874,7 @@ myFun({
 跟解构语法有什么不同？
 
 > 解构： 解构用于从数组或对象中提取值到独立的变量中。<br/>
-> 展开：展开运算符用于将可迭代对象（如 array、strings，maps，注意不包括对象）展开为单个元素。
+> 展开：展开运算符用于将可迭代对象（如 array、strings，maps，sets,（{% label 注意不包括对象，object不可迭代不是因为object的属性是无序的，而是因为对象本身不实现迭代协议 blue %}）展开为单个元素。
 
 ```js
 const arr = [1, 2, 3]
@@ -1748,6 +1910,20 @@ const str = 'Akbar'
 const strArr = [...str, ' ', 'A.']
 console.log(strArr)
 ```
+
+对象展开：
+
+```js
+const akbar = {
+  name: 'akbar',
+  age: 24,
+}
+
+const akbarClone = { ...akbar, location: 'hotan' }
+console.log(akbarClone)
+```
+
+> 注意：对象展开语法遵循的是对象展开语法`{...object}`， 而不是迭代器协议。
 
 **常见用途：**
 
@@ -1834,16 +2010,16 @@ rest2.numGuests ??= 10 // rest2.numGuests 赋值为 10（正确新增）
 
 # Event 事件
 
-- **Event是事件对象**：封装了事件发生时的具体信息（类型、时间戳、目标元素等）
+- **Event 是事件对象**：封装了事件发生时的具体信息（类型、时间戳、目标元素等）
 - **传递**：当事件被触发时，Event 对象会作为参数传递给事件处理函数
 
 ```js
 // Event 对象会作为参数传递给事件处理函数
 const openModal = function (event) {
-  event.preventDefault();
-  modal.classList.remove('hidden');
-  overlay.classList.remove('hidden');
-};
+  event.preventDefault()
+  modal.classList.remove('hidden')
+  overlay.classList.remove('hidden')
+}
 ```
 
 示例代码：
@@ -1859,65 +2035,68 @@ document.addEventListener('keyup', function (event) {
 
 ## 常见的事件类型
 
-| 事件类型        | 说明                           |
-| --------------- | ------------------------------ |
-| `click`         | 鼠标点击事件                   |
-| `mouseenter`    | 鼠标进入事件                   |
-| `mouseleave`    | 鼠标离开事件                   |
-| `keyup`         | 键盘按键释放事件                |
-| `keydown`       | 键盘按键按下事件                |
-| `load`          | 页面或资源加载完成事件           |
-| `submit`        | 表单提交事件                   |
-| `error`         | 发生错误时触发的事件             |
+| 事件类型     | 说明                                                            |
+| ------------ | --------------------------------------------------------------- |
+| `click`      | 鼠标点击事件                                                    |
+| `mouseenter` | 鼠标进入事件                                                    |
+| `mouseleave` | 鼠标离开事件                                                    |
+| `keyup`      | 键盘按键释放事件                                                |
+| `keydown`    | 键盘按键按下事件                                                |
+| `input`      | 输入框内容变化事件                                              |
+| `change`     | 输入框内容改变并失去焦点事件（可以用来监听 checkbox, radio 等） |
+| `load`       | 页面或资源加载完成事件                                          |
+| `submit`     | 表单提交事件(form 提交)                                         |
+| `error`      | 发生错误时触发的事件                                            |
 
 ## 事件绑定
 
 ```js
-const h1 = document.querySelector('h1');
+const h1 = document.querySelector('h1')
 
 // 第一种绑定事件的方法(推荐)
 h1.addEventListener('mouseenter', function () {
-  window.alert('Hello from h1, you hovered the h1 element');
-});
+  window.alert('Hello from h1, you hovered the h1 element')
+})
 
 // 第二种绑定事件的方法(不推荐, 老的写法)
 h1.onmouseenter = function () {
-  window.alert('Hello from h1, you hovered the h1 element');
-};
+  window.alert('Hello from h1, you hovered the h1 element')
+}
 
 // 比如点击事件(不推荐， 老的写法)
 h1.onclick = function () {
-  window.alert('Hello from h1, you hovered the h1 element');
-};
+  window.alert('Hello from h1, you hovered the h1 element')
+}
 ```
 
 ## 如果想只执行一次事件处理函数
 
 ```js
-const h1 = document.querySelector('h1');
+const h1 = document.querySelector('h1')
 
 // 第一种绑定事件的方法
 const alertH1 = function () {
-  window.alert('Hello from h1, you hovered the h1 element');
+  window.alert('Hello from h1, you hovered the h1 element')
 
   // 移除事件监听器, 先执行上面的alert, 再移除监听器
-  h1.removeEventListener('mouseenter', alertH1);
-};
+  h1.removeEventListener('mouseenter', alertH1)
+}
 
-h1.addEventListener('mouseenter', alertH1);
+h1.addEventListener('mouseenter', alertH1)
 ```
 
 也可以这样写：
+
 ```js
-const h1 = document.querySelector('h1');
+const h1 = document.querySelector('h1')
 
 // 第一种绑定事件的方法
 const alertH1 = function () {
-  window.alert('Hello from h1, you hovered the h1 element');
-};
+  window.alert('Hello from h1, you hovered the h1 element')
+}
 
-h1.addEventListener('mouseenter', alertH1);
-window.setTimeout(() => h1.removeEventListener('mouseenter', alertH1), 3000);
+h1.addEventListener('mouseenter', alertH1)
+window.setTimeout(() => h1.removeEventListener('mouseenter', alertH1), 3000)
 ```
 
 ## 事件冒泡
@@ -1927,6 +2106,7 @@ window.setTimeout(() => h1.removeEventListener('mouseenter', alertH1), 3000);
 事件冒泡（Event Bubbling）是指当一个事件被触发时，它会从最具体的元素（事件目标）开始，逐级向上传播到其父元素，直到到达最顶层的 DOM 树。
 
 事件冒泡有三个阶段：
+
 1. 捕获阶段（Capturing Phase）：事件从根节点向下传播到目标元素的路径上。
 2. 目标阶段（Target Phase）：事件到达目标元素并触发事件处理程序。
 3. 冒泡阶段（Bubbling Phase）：事件从目标元素向上传播回根节点的路径上。
@@ -1934,63 +2114,63 @@ window.setTimeout(() => h1.removeEventListener('mouseenter', alertH1), 3000);
 默认情况下，事件处理程序会在冒泡阶段被调用。
 如果想在捕获阶段处理事件，可以在添加事件监听器时传递第三个参数`true`。
 
-
-html解构：
+html 解构：
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251205133219889.png)
 
 **示例代码**：
-```js
-const randomInt = (min, max) => Math.trunc(Math.random() * (max - min + 1) + min);
 
-const randomColor = () => `rgb(${randomInt(0, 255)}, ${randomInt(0, 255)}, ${randomInt(0, 255)})`;
+```js
+const randomInt = (min, max) => Math.trunc(Math.random() * (max - min + 1) + min)
+
+const randomColor = () => `rgb(${randomInt(0, 255)}, ${randomInt(0, 255)}, ${randomInt(0, 255)})`
 
 document.querySelector('.nav__link').addEventListener('click', function (e) {
   // this 指向当前绑定事件的元素
-  this.style.backgroundColor = randomColor();
-  console.log('LINK', e.target, e.currentTarget);
+  this.style.backgroundColor = randomColor()
+  console.log('LINK', e.target, e.currentTarget)
   // e.currentTarget 指向当前绑定事件的元素
   // e.target 指向实际触发事件的元素
-  console.log(this === e.currentTarget);  // true
-});
+  console.log(this === e.currentTarget) // true
+})
 
 document.querySelector('.nav__links').addEventListener('click', function (e) {
-  this.style.backgroundColor = randomColor();
-  console.log('CONTAINER', e.target, e.currentTarget);
-});
+  this.style.backgroundColor = randomColor()
+  console.log('CONTAINER', e.target, e.currentTarget)
+})
 
 document.querySelector('.nav').addEventListener('click', function (e) {
-  this.style.backgroundColor = randomColor();
-  console.log('NAV', e.target, e.currentTarget);
-});
+  this.style.backgroundColor = randomColor()
+  console.log('NAV', e.target, e.currentTarget)
+})
 ```
 
 **怎么阻止事件冒泡**：
 
 {% codeblock lang:javascript mark:13,14 %}
-const randomInt = (min, max) => Math.trunc(Math.random() * (max - min + 1) + min);
+const randomInt = (min, max) => Math.trunc(Math.random() \* (max - min + 1) + min);
 
 const randomColor = () => `rgb(${randomInt(0, 255)}, ${randomInt(0, 255)}, ${randomInt(0, 255)})`;
 
-document.querySelector('.nav__link').addEventListener('click', function (e) {
-  // this 指向当前绑定事件的元素
-  this.style.backgroundColor = randomColor();
-  console.log('LINK', e.target, e.currentTarget);
-  // e.currentTarget 指向当前绑定事件的元素
-  // e.target 指向实际触发事件的元素
-  console.log(this === e.currentTarget); // true
+document.querySelector('.nav\_\_link').addEventListener('click', function (e) {
+// this 指向当前绑定事件的元素
+this.style.backgroundColor = randomColor();
+console.log('LINK', e.target, e.currentTarget);
+// e.currentTarget 指向当前绑定事件的元素
+// e.target 指向实际触发事件的元素
+console.log(this === e.currentTarget); // true
 
-  // 阻止事件冒泡, 阻止事件传播到更外层的元素
-  e.stopPropagation();
+// 阻止事件冒泡, 阻止事件传播到更外层的元素
+e.stopPropagation();
 });
 
-document.querySelector('.nav__links').addEventListener('click', function (e) {
-  this.style.backgroundColor = randomColor();
-  console.log('CONTAINER', e.target, e.currentTarget);
+document.querySelector('.nav\_\_links').addEventListener('click', function (e) {
+this.style.backgroundColor = randomColor();
+console.log('CONTAINER', e.target, e.currentTarget);
 });
 
 document.querySelector('.nav').addEventListener('click', function (e) {
-  this.style.backgroundColor = randomColor();
-  console.log('NAV', e.target, e.currentTarget);
+this.style.backgroundColor = randomColor();
+console.log('NAV', e.target, e.currentTarget);
 });
 {% endcodeblock %}
 
@@ -2003,28 +2183,27 @@ document.querySelector('.nav').addEventListener('click', function (e) {
 
 示例代码：
 
-html解构：
+html 解构：
+
 ```html
 <ul class="nav__links">
-          <li class="nav__item">
-            <a class="nav__link" href="#section--1">Features</a>
-          </li>
-          <li class="nav__item">
-            <a class="nav__link" href="#section--2">Operations</a>
-          </li>
-          <li class="nav__item">
-            <a class="nav__link" href="#section--3">Testimonials</a>
-          </li>
-          <li class="nav__item">
-            <a class="nav__link nav__link--btn btn--show-modal" href="#"
-              >Open account</a
-            >
-          </li>
+  <li class="nav__item">
+    <a class="nav__link" href="#section--1">Features</a>
+  </li>
+  <li class="nav__item">
+    <a class="nav__link" href="#section--2">Operations</a>
+  </li>
+  <li class="nav__item">
+    <a class="nav__link" href="#section--3">Testimonials</a>
+  </li>
+  <li class="nav__item">
+    <a class="nav__link nav__link--btn btn--show-modal" href="#">Open account</a>
+  </li>
 </ul>
 
 <!--  要跳转的section是这样的 -->
-  <section class="section" id="section--1"></section>
-  <section class="section" id="section--2"></section>
+<section class="section" id="section--1"></section>
+<section class="section" id="section--2"></section>
 ```
 
 我们的目标是点击导航栏的链接时，页面平滑滚动到对应的 section。
@@ -2048,16 +2227,14 @@ html解构：
  * 然后事件会沿着 DOM 树向上冒泡，经过每个祖先元素，直到根节点。
  * 因此在父元素上注册点击监听器，会接收到子元素触发并冒泡上来的事件。
  */
-document
-  .querySelector('.nav__links')
-  .addEventListener('click', function (event) {
-    event.preventDefault();
+document.querySelector('.nav__links').addEventListener('click', function (event) {
+  event.preventDefault()
 
-    if (event.target.classList.contains('nav__link') && event.target.getAttribute('href') !== '#') {
-      const id = event.target.getAttribute('href');
-      document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
-    }
-  });
+  if (event.target.classList.contains('nav__link') && event.target.getAttribute('href') !== '#') {
+    const id = event.target.getAttribute('href')
+    document.querySelector(id).scrollIntoView({ behavior: 'smooth' })
+  }
+})
 ```
 
 # window
@@ -2070,12 +2247,11 @@ document
 
 <mark>因为是全局对象，所以在全局作用域中可以直接访问其属性和方法，而不需要显式引用 window。</mark>
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Window',
 'MDN 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
-
 
 ## windwo.location
 
@@ -2097,12 +2273,11 @@ window.location = new Location // 浏览器内部创建好并挂载到 window �
 
 你无法 new Location，但浏览器已经替你创建好，并挂在 `window.location` 上供你使用。
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Window/location',
 'MDN 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
-
 
 ### 属性
 
@@ -2137,12 +2312,11 @@ console.log(Window.prototype.hasOwnProperty('console')) // false
 console.log('console' in window) // true
 ```
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Console_API',
 'MDN 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
-
 
 ### 常用的实例方法
 
@@ -2180,12 +2354,11 @@ DOM (Document Object Model)
     └── ... etc
 ```
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Document',
 'MDN 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
-
 
 ### 选择元素
 
@@ -2193,30 +2366,29 @@ far fa-hand-point-right,blue larger
 
 ```js
 // 4.获取根元素
-const rootElement = document.documentElement    // entire HTML document
+const rootElement = document.documentElement // entire HTML document
 ```
 
 2. **document.title**：获取网页标题。
 
 ```js
-const title = document.title        // <head> element of the document 
+const title = document.title // <head> element of the document
 console.log(`Page title: ${title}`)
 ```
 
 3. **document.body**：获取 body 元素
 
 ```js
-console.log(document.body); // <body> element of the document
+console.log(document.body) // <body> element of the document
 ```
 
 4. **document.querySelector**：返回文档中与指定选择器匹配的第一个`Element`对象。
 
 ```js
-const header = document.querySelector('.header'); // first element with class 'header'
+const header = document.querySelector('.header') // first element with class 'header'
 ```
 
 5. **document.querySelectorAll**：返回与指定的选择器组匹配的文档中的元素列表，返回的对象是 NodeList。
-
 
 > NodeList 对象是节点的集合。
 > NodeList 不是一个数组，是一个类似数组的对象 (Like Array Object)。虽然 NodeList 不是一个数组，但是可以使用 forEach() 来迭代。
@@ -2232,7 +2404,7 @@ const header = document.querySelector('.header'); // first element with class 'h
 1. **document.createElement**：create a new element, and return it
 
 ```js
-const message = document.createElement('div'); // create a new <div> element, and return it
+const message = document.createElement('div') // create a new <div> element, and return it
 ```
 
 2. **设置文本：`textContent`**
@@ -2244,24 +2416,24 @@ const message = document.createElement('div'); // create a new <div> element, an
 > 因为 `<input>` 标签是自闭合的，没有内部文本节点：
 
 ```js
-const message = document.createElement('div'); // create a new <div> element, and return it
-message.textContent = 'We use cookies for improved functionality and analytics.';
+const message = document.createElement('div') // create a new <div> element, and return it
+message.textContent = 'We use cookies for improved functionality and analytics.'
 ```
 
 3. `innerHTML`：设置或获取 HTML 语法表示的元素的后代。
 
 ```js
-const message = document.createElement('div');
+const message = document.createElement('div')
 message.innerHTML =
-  'We use cookies for improved functionality and analytics. <button class="btn btn--close-cookie">Got it!</button>';
+  'We use cookies for improved functionality and analytics. <button class="btn btn--close-cookie">Got it!</button>'
 ```
 
 4. **value**: current value of the [`<input>`] element as a string.
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/HTMLInputElement',
 'MDN 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
 比如：
@@ -2281,50 +2453,51 @@ document.querySelector('input').textContent = 'Hello' // 无效 ❌
 
 ```js
 // 作为第一个子元素插入到header中
-header.prepend(message);
+header.prepend(message)
 ```
 
 2. **append**：作为最后一个子元素插入
 
 ```js
 // 作为最后一个子元素插入到header中
-header.append(message);
+header.append(message)
 ```
 
 {% note primary modern %}
 需要注意的是：  
-如果一个元素已经存在于页面中，调用prepend或append会将其从原来的位置移动到新的位置，而不是再插入一个新的元素。
+如果一个元素已经存在于页面中，调用 prepend 或 append 会将其从原来的位置移动到新的位置，而不是再插入一个新的元素。
 {% endnote %}
 
 3. **cloneNode**：插入相同的多个元素
 
 ```js
 // 如果想在header中插入多个相同的元素，可以使用cloneNode方法
-header.append(message.cloneNode(true)); // 深度克隆，包括子元素
+header.append(message.cloneNode(true)) // 深度克隆，包括子元素
 ```
 
 4. **before**：插入到该元素之前
 
 ```js
 // 将message插入到header之前
-header.before(message); 
+header.before(message)
 ```
 
 5. **after**：插入到该元素之后。
 
 ```js
 // 将message插入到header之后
-header.after(message); 
+header.after(message)
 ```
 
 6. `insertAdjacentHTML()`：将指定的文本解析为  `Element`元素，并将结果节点插入到 DOM 树中的指定位置。
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Element/insertAdjacentHTML',
 'MDN 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
+7. **appendChild()**： 将一个节点添加到指定父节点的子节点列表的末尾。
 
 ### 删除元素
 
@@ -2332,22 +2505,18 @@ far fa-hand-point-right,blue larger
 
 ```js
 // 删除元素
-document
-  .querySelector('.btn--close-cookie')
-  .addEventListener('click', function () {
-    message.remove();
-  });
+document.querySelector('.btn--close-cookie').addEventListener('click', function () {
+  message.remove()
+})
 ```
 
 2. **removeChild**：让父元素去删除
 
 ```js
 // 删除元素
-document
-  .querySelector('.btn--close-cookie')
-  .addEventListener('click', function () {
-    message.parentElement.removeChild(message);
-  });
+document.querySelector('.btn--close-cookie').addEventListener('click', function () {
+  message.parentElement.removeChild(message)
+})
 ```
 
 ### 行内样式 Styles
@@ -2357,25 +2526,26 @@ document
 > 不仅可以设置行内样式，还可以读取行内样式。
 
 ```js
-const message = document.createElement('div'); 
+const message = document.createElement('div')
 
 // 设置行内样式
-message.style.backgroundColor = '#37383d';
-message.style.width = '120%';
+message.style.backgroundColor = '#37383d'
+message.style.width = '120%'
 
 // 只能获取内联样式，如果不存在这个行内样式，则返回空字符串
-console.log(message.style.backgroundColor); 
+console.log(message.style.backgroundColor)
 console.log(message.style.width)
 ```
 
-如果想获取css选择器设置的样式，怎么办？
+如果想获取 css 选择器设置的样式，怎么办？
+
 ```js
 // 如果想获取通过css选择器设置的样式，需要使用getComputedStyle
-console.log(getComputedStyle(message).color);
-console.log(getComputedStyle(message).height);
+console.log(getComputedStyle(message).color)
+console.log(getComputedStyle(message).height)
 ```
 
-### 控制css variables
+### 控制 css variables
 
 ```js
 document.documentElement.style.setProperty('--color-primary', 'orangered');
@@ -2388,17 +2558,18 @@ document.documentElement.style.setProperty('--color-primary', 'orangered');
 
 ### Attributes
 
-> src, alt, class, id 等等都是Attributes。
+> src, alt, class, id 等等都是 Attributes。
 > 这些属性都可以读，也可以写。
 
 比如：
+
 ```html
         <img
           src="img/logo.png"
           alt="Bankist logo"
           class="nav__logo"
           id="logo"
-          designer="akbar"            自定义属性 
+          designer="akbar"            自定义属性
           data-version-number="3.0"   data attributes
         />
 
@@ -2409,82 +2580,84 @@ document.documentElement.style.setProperty('--color-primary', 'orangered');
 
 ```js
 // Attributes
-const logo = document.querySelector('.nav__logo');
-console.log(logo.alt);
-console.log(logo.className);
-console.log(logo.src);                                     // 绝对路径
-console.log(logo.getAttribute('src'));                     // 相对路径
-console.log(logo.getAttribute('designer'));                // 自定义属性
-logo.setAttribute('company', 'Bankist');                   // 设置自定义属性
-console.log(logo.getAttribute('company'));
-console.log(logo.dataset.versionNumber)                    // 访问data-version-number属性
+const logo = document.querySelector('.nav__logo')
+console.log(logo.alt)
+console.log(logo.className)
+console.log(logo.src) // 绝对路径
+console.log(logo.getAttribute('src')) // 相对路径
+console.log(logo.getAttribute('designer')) // 自定义属性
+logo.setAttribute('company', 'Bankist') // 设置自定义属性
+console.log(logo.getAttribute('company'))
+console.log(logo.dataset.versionNumber) // 访问data-version-number属性
 
 const link = document.querySelector('.nav__link--btn')
-console.log(link.href);                                    // 绝对路径
-console.log(link.getAttribute('href'));                    // 相对路径
+console.log(link.href) // 绝对路径
+console.log(link.getAttribute('href')) // 相对路径
 ```
 
-### 类名Class
+### 类名 Class
 
 ```html
-        <img
-          src="img/logo.png"
-          alt="Bankist logo"
-          class="nav__logo"
-          id="logo"
-          designer="akbar"            自定义属性 
-          data-version-number="3.0"   data attributes
-        />
+<img
+  src="img/logo.png"
+  alt="Bankist logo"
+  class="nav__logo"
+  id="logo"
+  designer="akbar"
+  自定义属性
+  data-version-number="3.0"
+  data
+  attributes
+/>
 ```
 
 ```js
-const logo = document.querySelector('.nav__logo');
+const logo = document.querySelector('.nav__logo')
 
-logo.className = 'jonas'; // 不推荐， 会覆盖掉所有的类
+logo.className = 'jonas' // 不推荐， 会覆盖掉所有的类
 
-logo.classList.add('class1', 'class2');
-logo.classList.remove('class1');
-logo.classList.toggle('class2');    // 如果存在则删除，否则添加
-logo.classList.contains('class2'); // true
+logo.classList.add('class1', 'class2')
+logo.classList.remove('class1')
+logo.classList.toggle('class2') // 如果存在则删除，否则添加
+logo.classList.contains('class2') // true
 ```
 
 ### getBoundingClientRect()
 
 其提供了元素的大小及其相对于视口的位置。
-这里的Rect是Rectangle的意思。
+这里的 Rect 是 Rectangle 的意思。
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Element/getBoundingClientRect',
 'MDN 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
 ### clientWidth 和 clientHeight
 
 返回元素的可见宽高（内容 + 内边距，不包括边框、滚动条、外边距）。
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Element/clientWidth',
 'MDN ClientWidth 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Element/clientHeight',
 'MDN ClientHeight 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
 ### focus()元素聚焦
 
-input元素获取焦点
+input 元素获取焦点
 
 ```js
-const inputDistance = document.querySelector('.form__input--distance');
+const inputDistance = document.querySelector('.form__input--distance')
 
-inputDistance.focus();
+inputDistance.focus()
 ```
-
 
 ## window.innerWidth
 
@@ -2498,7 +2671,7 @@ inputDistance.focus();
 
 {% note warning flat %}
 **注意**
-localstorage操作会阻塞主线程，尤其是在存储大量数据时。
+localstorage 操作会阻塞主线程，尤其是在存储大量数据时。
 {% endnote %}
 
 ### 实例方法
@@ -2548,37 +2721,37 @@ localStorage.clear()
 
 重复调用一个函数或执行一个代码片段，在每次调用之间具有固定的时间间隔。
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Window/setInterval',
 'MDN 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
 ```js
 const startLogoutTimer = function () {
   // Set time to 5 minutes
-  let time = 10;
+  let time = 10
 
   // Call the timer every second
   const myTimer = setInterval(function () {
-    const min = String(Math.trunc(time / 60)).padStart(2, '0');
-    const sec = String(time % 60).padStart(2, '0');
+    const min = String(Math.trunc(time / 60)).padStart(2, '0')
+    const sec = String(time % 60).padStart(2, '0')
 
     //in each call , print the remaining time to console
-    console.log(`${min}:${sec}`);
+    console.log(`${min}:${sec}`)
 
     // when 0 seconds, stop timer and logout user
     if (time === 0) {
-      clearInterval(myTimer);
-      console.log('Log out!');
+      clearInterval(myTimer)
+      console.log('Log out!')
     }
 
     // decrease 1s
-    time--;
-  }, 1000);
-};
+    time--
+  }, 1000)
+}
 
-startLogoutTimer();
+startLogoutTimer()
 ```
 
 ## window.clearInterval()
@@ -2591,51 +2764,51 @@ window.setInterval()返回的值可以用来传递给  `clearInterval()`来清�
 
 定时器属于宏任务。
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Window/setTimeout',
 'MDN 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
 示例代码：
 
 ```js
 window.setTimeout(
-  () => console.log('Here is your pizza'), 
-  3000 // 3秒之后执行callback函数
-);
+  () => console.log('Here is your pizza'),
+  3000, // 3秒之后执行callback函数
+)
 
 console.log('Waiting...')
 ```
-> JavaScript一旦看到setTimeout，就知道这是一个延迟执行的代码，背后开启一个计时器，紧接着继续执行下面的代码，一旦背后的计时器的时间到了，比如`3000`毫秒，就回头执行`setTimeout`中的代码。
+
+> JavaScript 一旦看到 setTimeout，就知道这是一个延迟执行的代码，背后开启一个计时器，紧接着继续执行下面的代码，一旦背后的计时器的时间到了，比如`3000`毫秒，就回头执行`setTimeout`中的代码。
 
 完整写法：
+
 ```js
 window.setTimeout(
   (ing1, ing2) => console.log(`Here is your ${ing1} and ${ing2}`),
   3000,
   'Pizza 🍕',
-  'Pasta 🍝'
-);
+  'Pasta 🍝',
+)
 ```
+
 ```js
-'Pizza 🍕',
-'Pasta 🍝'
+'Pizza 🍕', 'Pasta 🍝'
 ```
-给callback函数传递参数，对应ing1，ing2
+
+给 callback 函数传递参数，对应 ing1，ing2
 
 ## window.clearTimeout()
 
 可以将 window.setTimeout()返回的值传递给  `clearTimeout()`来取消该定时器。
 
 ```js
-const myTimer = window.setTimeout(
-  () => console.log(`Here is your ${ing1} and ${ing2}`),
-  3000
-);
+const myTimer = window.setTimeout(() => console.log(`Here is your ${ing1} and ${ing2}`), 3000)
 
 // 3000毫秒到达之前取消定时器
-window.clearTimeout(myTimer);
+window.clearTimeout(myTimer)
 ```
 
 ## window.scrollTo()
@@ -2643,6 +2816,7 @@ window.clearTimeout(myTimer);
 滚动窗口到指定位置
 
 参数：
+
 - x-coord：水平像素值
 - y-coord：垂直像素值
 - behavior（可选）：滚动行为，`'auto'`（默认）或`'smooth'`
@@ -2653,33 +2827,35 @@ x-coord 和 y-coord 是相对于文档左上角的坐标，而不是相对于当
 {% endnote %}
 
 示例代码：
+
 ```js
 // Scrolling
-const btnScrollTo = document.querySelector('.btn--scroll-to');
-const section1 = document.querySelector('#section--1');
+const btnScrollTo = document.querySelector('.btn--scroll-to')
+const section1 = document.querySelector('#section--1')
 
 btnScrollTo.addEventListener('click', function () {
-  const s1coords = section1.getBoundingClientRect();
+  const s1coords = section1.getBoundingClientRect()
   // 相对于视口的信息
-  console.log(s1coords);
+  console.log(s1coords)
 
   window.scrollTo({
     left: s1coords.left + window.scrollX,
     top: s1coords.top + window.scrollY,
     behavior: 'smooth',
-  });
-});
+  })
+})
 ```
 
-但是还有更简单的方法😁，推荐使用`scrollIntoView()`方法。
+但是还有更简单的方法 😁，推荐使用`scrollIntoView()`方法。
+
 ```js
 // Scrolling
-const btnScrollTo = document.querySelector('.btn--scroll-to');
-const section1 = document.querySelector('#section--1');
+const btnScrollTo = document.querySelector('.btn--scroll-to')
+const section1 = document.querySelector('#section--1')
 
 btnScrollTo.addEventListener('click', function () {
-  section1.scrollIntoView({ behavior: 'smooth' });
-});
+  section1.scrollIntoView({ behavior: 'smooth' })
+})
 ```
 
 ## window.scrollX 和 window.scrollY
@@ -2691,16 +2867,16 @@ btnScrollTo.addEventListener('click', function () {
 scrollX 和 scrollY 返回的是相对于文档左上角的坐标，而不是相对于当前视口的位置。
 {% endnote %}
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Window/scrollX',
 'MDN ScrollX 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/API/Window/scrollY',
 'MDN ScrollY 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
 ## window.navigator
@@ -2710,13 +2886,12 @@ far fa-hand-point-right,blue larger
 1. **navigator.geolocation.getCurrentPosition()**：获取用户的当前位置。
 
 语法：
+
 ```js
-getCurrentPosition(success)                 // success 回调函数
-getCurrentPosition(success, error)          // success 是成功回调， error 是失败回调
+getCurrentPosition(success) // success 回调函数
+getCurrentPosition(success, error) // success 是成功回调， error 是失败回调
 getCurrentPosition(success, error, options) // options 可选参数
 ```
-
-
 
 # 为什么说 JavaScript 不是纯解释型语言？
 
@@ -2757,14 +2932,60 @@ V8 会做两件事：
 
 # `执行上下文` 和 `作用域链`
 
-{% btn 
+{% btn
 'https://juejin.cn/post/7486429532720349199',
 '掘金文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
-
 # Math
+
+## Math.trunc()
+
+该静态方法通过删除任何小数位来返回数字的整数部分。
+
+比如：
+
+```js
+console.log(Math.trunc(13.37)) // 输出 13
+```
+
+## Math.floor()
+
+向下取整，返回小于或等于给定数字的最大整数。
+
+比如：
+
+```js
+console.log(Math.floor(13.37)) // 输出 13
+console.log(Math.floor(13.99)) // 输出 13
+console.log(Math.floor(-13.37)) // 输出 -14
+```
+
+## Math.ceil()
+
+向上取整，返回大于或等于给定数字的最小整数。
+
+比如：
+
+```js
+console.log(Math.ceil(13.37)) // 输出 14
+console.log(Math.ceil(13.01)) // 输出 14
+console.log(Math.ceil(-13.37)) // 输出 -13
+```
+
+## Math.round()
+
+四舍五入，返回最接近的整数。
+
+比如：
+
+```js
+console.log(Math.round(13.37)) // 输出 13
+console.log(Math.round(13.5)) // 输出 14
+console.log(Math.round(-13.37)) // 输出 -13
+console.log(Math.round(-13.5)) // 输出 -13
+```
 
 ```js
 // 求平方根
@@ -2860,49 +3081,52 @@ const options = {
 }
 console.log(new Intl.DateTimeFormat('zh-CN', options).format(now))
 ```
-{% btn 
+
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat',
 具体细节,
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
 ## 数字国际化
 
 ```js
-const num = 3884764.23;
+const num = 3884764.23
 const optionsForNum = {
   style: 'unit',
   unit: 'mile-per-hour',
-};
-console.log(
-  'China:',
-  new Intl.NumberFormat('zh-CN', optionsForNum).format(num)
-);
+}
+console.log('China:', new Intl.NumberFormat('zh-CN', optionsForNum).format(num))
 ```
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat',
 具体细节,
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
-
 
 # this 关键字
 
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251202210422015.png)
 
+- 对象方法：`this` 指向调用该方法的对象。
+- 普通函数：`this` 指向全局对象（浏览器中是 `window`，严格模式下是 `undefined`）。
+- 构造函数：`this` 指向新创建的实例对象。
+- 箭头函数：`this` 继承自外层作用域。
+- 事件处理器：`this` 指向触发事件的 DOM 元素。
+
 ## function.call()方法
 
-{% btn 
+{% btn
 'https://www.bilibili.com/video/BV1vA4y197C7?spm_id_from=333.788.videopod.episodes&vd_source=28e37be50df53ebbf04edfcc6228018f&p=124',
 'B站视频',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
-{% btn 
+{% btn
 'https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/call',
 'MDN 文档',
-far fa-hand-point-right,blue larger 
+far fa-hand-point-right,blue larger
 %}
 
 ## function.bind()方法
@@ -2914,35 +3138,56 @@ far fa-hand-point-right,blue larger
 ```js
 const person = {
   firstName: 'Akbar',
-  greet: function() {
-    console.log(`Hello, my name is ${this.firstName}`);
-  }
-};
+  greet: function () {
+    console.log(`Hello, my name is ${this.firstName}`)
+  },
+}
 
-const akbar = person.greet;
-akbar(); // 输出: Hello, my name is undefined
+const akbar = person.greet
+akbar() // 输出: Hello, my name is undefined
 
 // 使用 bind 方法将 this 绑定到 person 对象
-const boundGreet = akbar.bind(person);
-boundGreet(); // 输出: Hello, my name is Akbar
+const boundGreet = akbar.bind(person)
+boundGreet() // 输出: Hello, my name is Akbar
 ```
 
+比如 vue3 中使用
+
+{% codeblock lang:typescript mark:12 %}
+const app = Vue.createApp({
+data() {
+return {
+counter: 0,
+}
+},
+watch: {
+counter(value) {
+if (value > 50) {
+window.setTimeout(function () { // // this 原本指向的是 window 对象
+this.counter = 0
+}.bind(this), 2000) // 通过 bind 将 this 绑定到 Vue 实例
+}
+},
+},
+{%endcodeblock%}
 
 # 面向对象
 
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251205154030603.png)
 
 **面向对象的几个元素**：
+
 - 抽象（Abstraction）
 - 封装（Encapsulation）
 - 继承（Inheritance）
 - 多态（Polymorphism）
 
-## JavaScript中的面向对象
+## JavaScript 中的面向对象
 
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251205155904569.png)
 
-**JavaScript中如何创建`prototype`**？
+**JavaScript 中如何创建`prototype`**？
+
 - 使用构造函数（Constructor Functions）
 - 使用`Object.create()`
 - 使用 ES6 的`class`语法糖：背后还是基于原型的继承机制、构造函数创建。
@@ -2958,43 +3203,47 @@ boundGreet(); // 输出: Hello, my name is Akbar
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251205172131457.png)
 
 ```js
-const Person = function(firstName, birthYear) {
+const Person = function (firstName, birthYear) {
   // Instance properties, available on all instances
-  this.firstName = firstName;
-  this.birthYear = birthYear;
+  this.firstName = firstName
+  this.birthYear = birthYear
 }
 
-const akbar = new Person('Akbar',2001)
+const akbar = new Person('Akbar', 2001)
 ```
 
 构造流程（当你执行 `new Person(...)` 时）：
-  - 创建一个空对象 `{}`。
-  - 将函数 `Person` 内的 `this` 绑定到这个新对象。
-  - 新对象会被自动链接到构造函数的 `prototype`（即新对象的 `__proto__` 指向 `Person.prototype`）。
-  - 函数执行完毕后，默认返回这个新对象。
+
+- 创建一个空对象 `{}`。
+- 将函数 `Person` 内的 `this` 绑定到这个新对象。
+- 新对象会被自动链接到构造函数的 `prototype`（即新对象的 `__proto__` 指向 `Person.prototype`）。
+- 函数执行完毕后，默认返回这个新对象。
 
 ---
 
 ```js
-const Person = function(firstName, birthYear) {
+const Person = function (firstName, birthYear) {
   // Instance properties, available on all instances
-  this.firstName = firstName;
-  this.birthYear = birthYear;
+  this.firstName = firstName
+  this.birthYear = birthYear
 }
 
-const akbar = new Person('Akbar',2001)
+const akbar = new Person('Akbar', 2001)
 
 console.log(akbar instanceof Person)
 ```
-**`instanceof`**：
-  - `akbar instanceof Person` → true，因为 `Person.prototype` 在 `akbar` 的原型链上。`akbar.__proto__ === Person.prototype`。
 
---- 
+**`instanceof`**：
+
+- `akbar instanceof Person` → true，因为 `Person.prototype` 在 `akbar` 的原型链上。`akbar.__proto__ === Person.prototype`。
+
+---
+
 ```js
-const Person = function(firstName, birthYear) {
+const Person = function (firstName, birthYear) {
   // Instance properties, available on all instances
-  this.firstName = firstName;
-  this.birthYear = birthYear;
+  this.firstName = firstName
+  this.birthYear = birthYear
 
   // Never create methods inside constructor functions
   // because it will create a new copy of the method for every object
@@ -3004,24 +3253,26 @@ const Person = function(firstName, birthYear) {
 }
 
 // 要这样写
-Person.prototype.calcAge = function() {
-  console.log(2025 - this.birthYear);
+Person.prototype.calcAge = function () {
+  console.log(2025 - this.birthYear)
 }
 
 // 调用calcAge方法
 akbar.calcAge()
 ```
+
 **最佳实践小结**：
 
-  - 不要在构造函数内部为每个实例创建方法（会造成每个实例持有独立函数）。
-  - 需要共享行为时，把方法放到 `Constructor.prototype` 或者使用 ES6 `class`（本质上仍是基于原型）。
-  - 如果要创建没有原型链的对象、或做更细的继承控制，可考虑 `Object.create()`。
+- 不要在构造函数内部为每个实例创建方法（会造成每个实例持有独立函数）。
+- 需要共享行为时，把方法放到 `Constructor.prototype` 或者使用 ES6 `class`（本质上仍是基于原型）。
+- 如果要创建没有原型链的对象、或做更细的继承控制，可考虑 `Object.create()`。
+
 ---
 
 ```js
-const Person = function(firstName, birthYear) {
-  this.firstName = firstName;
-  this.birthYear = birthYear;
+const Person = function (firstName, birthYear) {
+  this.firstName = firstName
+  this.birthYear = birthYear
 }
 
 Person.prototype.species = 'Homo Sapiens'
@@ -3029,27 +3280,28 @@ Person.prototype.species = 'Homo Sapiens'
 console.log(akbar.hasOwnProperty('firstName'))
 console.log(akbar.hasOwnProperty('species'))
 ```
+
 **`hasOwnProperty` vs 继承属性`**：
 
-  - `akbar.hasOwnProperty('firstName')` 为 `true`（实例自身的属性）。
-  - `akbar.hasOwnProperty('species')` 为 `false`，因为 `species` 在原型上，是继承来的。
+- `akbar.hasOwnProperty('firstName')` 为 `true`（实例自身的属性）。
+- `akbar.hasOwnProperty('species')` 为 `false`，因为 `species` 在原型上，是继承来的。
 
 **原型链查找**：
 
-  - 当你访问 `akbar.calcAge()` 时，JavaScript 先在 akbar 对象自身查找；找不到就沿着 `__proto__`（即 `Person.prototype`）查找；找到则调用。
+- 当你访问 `akbar.calcAge()` 时，JavaScript 先在 akbar 对象自身查找；找不到就沿着 `__proto__`（即 `Person.prototype`）查找；找到则调用。
 
 ### 有趣的示例代码
 
-> 我想扩展Array.prototype
+> 我想扩展 Array.prototype
 
 ```js
-const arr = [1,1,1, 3,3,3, 4,4,5]
+const arr = [1, 1, 1, 3, 3, 3, 4, 4, 5]
 
-Array.prototype.unique = function() {
+Array.prototype.unique = function () {
   return [...new Set(this)]
 }
 
-console.log(arr.unique())  // 输出：[1, 3, 4, 5]
+console.log(arr.unique()) // 输出：[1, 3, 4, 5]
 ```
 
 {% note warning modern %}
@@ -3070,29 +3322,29 @@ DATA CAR 2: 'Mercedes' going at 95 km/h
 GOOD LUCK 😀
 
 ```js
-const Car = function(make, speed) {
-  this.make = make;
-  this.speed = speed;
+const Car = function (make, speed) {
+  this.make = make
+  this.speed = speed
 }
 
-Car.prototype.accelerate = function() {
-  this.speed += 10;
-  console.log(`${this.make} is going at ${this.speed} km/h`);
+Car.prototype.accelerate = function () {
+  this.speed += 10
+  console.log(`${this.make} is going at ${this.speed} km/h`)
 }
 
-Car.prototype.brake = function() {
-  this.speed -= 5;
-  console.log(`${this.make} is going at ${this.speed} km/h`);
+Car.prototype.brake = function () {
+  this.speed -= 5
+  console.log(`${this.make} is going at ${this.speed} km/h`)
 }
 
-const bmw = new Car('BMW', 120);
-const mercedes = new Car('Mercedes', 95);
+const bmw = new Car('BMW', 120)
+const mercedes = new Car('Mercedes', 95)
 
-bmw.accelerate(); 
-bmw.brake(); 
+bmw.accelerate()
+bmw.brake()
 
-mercedes.accelerate();
-mercedes.brake();
+mercedes.accelerate()
+mercedes.brake()
 ```
 
 ## ES6 Classes
@@ -3100,45 +3352,42 @@ mercedes.brake();
 > class 其实一种特殊的函数，是构造函数的语法糖。
 
 有两种定义 class 的方式：
+
 ```js
 // class expression
-const Animal = class {
-
-}
+const Animal = class {}
 
 // class declaration
-class Person {
-
-}
+class Person {}
 ```
 
 示例代码：
+
 ```js
 class Person {
   constructor(firstName, birthYear) {
-    this.firstName = firstName;
-    this.birthYear = birthYear;
+    this.firstName = firstName
+    this.birthYear = birthYear
   }
 
   calcAge() {
-    console.log(2025 - this.birthYear);
+    console.log(2025 - this.birthYear)
   }
 }
 
-const akbar = new Person('Akbar', 2001);
+const akbar = new Person('Akbar', 2001)
 
-console.log(akbar);
-akbar.calcAge();
+console.log(akbar)
+akbar.calcAge()
 
-console.log(akbar instanceof Person);
-console.log(akbar.__proto__ === Person.prototype);
-
+console.log(akbar instanceof Person)
+console.log(akbar.__proto__ === Person.prototype)
 
 // 手动添加方法
 Person.prototype.greet = function () {
-  console.log(`Hello, my name is ${this.firstName}`);
+  console.log(`Hello, my name is ${this.firstName}`)
 }
-akbar.greet();
+akbar.greet()
 ```
 
 ### 注意事项
@@ -3149,111 +3398,112 @@ akbar.greet();
 
 ## Setters 和 Getters
 
-getter和setter是JavaScript类中用于访问和修改对象属性的特殊方法，它们让你能够更好地控制属性的读写操作。
+getter 和 setter 是 JavaScript 类中用于访问和修改对象属性的特殊方法，它们让你能够更好地控制属性的读写操作。
 
 比如：
+
 ```js
 const account = {
   owner: 'akbar',
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
 
   get latest() {
-    return this.movements.slice(-1)[0];
+    return this.movements.slice(-1)[0]
   },
 
   set latest(mov) {
-    this.movements.push(mov);
+    this.movements.push(mov)
   },
-};
+}
 
 // 使用 getter
-console.log(account.latest);
+console.log(account.latest)
 // 使用 setter
-account.latest = 50;
-console.log(account.movements);
+account.latest = 50
+console.log(account.movements)
 ```
 
-**class也可以使用getter和setter**：
+**class 也可以使用 getter 和 setter**：
 
 ```js
 class Person {
   constructor(name, age) {
-    this._name = name;  // 使用下划线表示私有属性
-    this._age = age;
+    this._name = name // 使用下划线表示私有属性
+    this._age = age
   }
-  
+
   // getter方法
   get name() {
-    return this._name;
+    return this._name
   }
-  
+
   get age() {
-    return this._age;
+    return this._age
   }
-  
+
   // setter方法
   set name(newName) {
     if (newName.length > 0) {
-      this._name = newName;
+      this._name = newName
     }
   }
-  
+
   set age(newAge) {
     if (newAge >= 0 && newAge <= 150) {
-      this._age = newAge;
+      this._age = newAge
     }
   }
 }
 
-const person = new Person('张三', 25);
-console.log(person.name);  // 使用getter，输出: 张三
-person.name = '李四';      // 使用setter
-console.log(person.name);  // 输出: 李四
+const person = new Person('张三', 25)
+console.log(person.name) // 使用getter，输出: 张三
+person.name = '李四' // 使用setter
+console.log(person.name) // 输出: 李四
 ```
 
 ## Static
 
-static关键字用于定义类的静态方法或静态属性，它们属于类本身而不是类的实例。
+static 关键字用于定义类的静态方法或静态属性，它们属于类本身而不是类的实例。
 
 比如：`Array.from()`, `Number.parseInt()`等。只能通过类本身调用，不能通过实例调用，因为这些属性和方法只属于类，而不是属于示例。
 
 ```js
 class Person {
   constructor(name, age) {
-    this._name = name;  
-    this._age = age;
+    this._name = name
+    this._age = age
   }
-  
+
   // getter方法
   get name() {
-    return this._name;
+    return this._name
   }
-  
+
   get age() {
-    return this._age;
+    return this._age
   }
-  
+
   // setter方法
   set name(newName) {
     if (newName.length > 0) {
-      this._name = newName;
+      this._name = newName
     }
   }
-  
+
   set age(newAge) {
     if (newAge >= 0 && newAge <= 150) {
-      this._age = newAge;
+      this._age = newAge
     }
   }
 }
 
 // 创建静态方法
-Person.hey = function() {
-  console.log('Hey there!');
-  console.log(this);  // 指向Person类本身, 因为Person调用这个方法
+Person.hey = function () {
+  console.log('Hey there!')
+  console.log(this) // 指向Person类本身, 因为Person调用这个方法
 }
 
-const person = new Person('张三', 25);
+const person = new Person('张三', 25)
 
 console.log(person.hey) // undefined
 Person.hey() // Hey there!
@@ -3266,28 +3516,28 @@ Person.hey() // Hey there!
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251205204715659.png)
 
 比如：
+
 ```js
 const PersonProto = {
-
   // 初始化方法, 相当于类的构造函数
   init(firstName, birthYear) {
-    this.firstName = firstName;
-    this.birthYear = birthYear;
+    this.firstName = firstName
+    this.birthYear = birthYear
   },
 
   calcAge() {
     // 这里的 this 指向调用该方法的对象
-    console.log(2025 - this.birthYear);
-  }
+    console.log(2025 - this.birthYear)
+  },
 }
 
 const akbar = Object.create(PersonProto)
 
-akbar.init('Akbar', 1998);
-akbar.calcAge();
-console.log(akbar);
+akbar.init('Akbar', 1998)
+akbar.calcAge()
+console.log(akbar)
 
-console.log(akbar.__proto__ === PersonProto)  // true
+console.log(akbar.__proto__ === PersonProto) // true
 ```
 
 ## 继承
@@ -3298,34 +3548,34 @@ console.log(akbar.__proto__ === PersonProto)  // true
 
 ```js
 const Person = function (firstName, birthYear) {
-  this.firstName = firstName;
-  this.birthYear = birthYear;
-};
+  this.firstName = firstName
+  this.birthYear = birthYear
+}
 
 Person.prototype.calcAge = function () {
-  console.log(2025 - this.birthYear);
-};
+  console.log(2025 - this.birthYear)
+}
 
 const Student = function (firstName, birthYear, course) {
-  Person.call(this, firstName, birthYear);
-  this.course = course;
-};
+  Person.call(this, firstName, birthYear)
+  this.course = course
+}
 
 // Linking prototypes
 // 注意顺序：必须在定义 Student.prototype.introduce 之前
 Student.prototype = Object.create(Person.prototype)
 
 Student.prototype.introduce = function () {
-  console.log(`My name is ${this.firstName} and I study ${this.course}`);
-};
+  console.log(`My name is ${this.firstName} and I study ${this.course}`)
+}
 
 // Correct the constructor pointer because it points to Person
-Student.prototype.constructor = Student;
+Student.prototype.constructor = Student
 
-const mike = new Student('Mike', 2020, 'Computer Science');
-console.log(mike);
-mike.introduce();
-mike.calcAge();
+const mike = new Student('Mike', 2020, 'Computer Science')
+console.log(mike)
+mike.introduce()
+mike.calcAge()
 ```
 
 ### 通过 ES6 class 实现继承
@@ -3333,39 +3583,37 @@ mike.calcAge();
 ```js
 class Person {
   constructor(fullName, birthYear) {
-    this.name = fullName;
-    this.birthYear = birthYear;
+    this.name = fullName
+    this.birthYear = birthYear
   }
 
   calcAge() {
-    const age = 2025 - this.birthYear;
-    console.log(`${this.name} is ${age} years old.`);
+    const age = 2025 - this.birthYear
+    console.log(`${this.name} is ${age} years old.`)
   }
 }
 
 class Student extends Person {
   constructor(fullName, birthYear, course) {
     // Call the parent class constructor
-    super(fullName, birthYear);
-    this.course = course;
+    super(fullName, birthYear)
+    this.course = course
   }
 
   // 重写calcAge方法
   calcAge() {
-    const age = 2025 - this.birthYear;
-    console.log(
-      `${this.name} is ${age} years old., and is studying ${this.course}.`
-    );
+    const age = 2025 - this.birthYear
+    console.log(`${this.name} is ${age} years old., and is studying ${this.course}.`)
   }
 
   introduce() {
-    console.log(`My name is ${this.name} and I study ${this.course}.`);
+    console.log(`My name is ${this.name} and I study ${this.course}.`)
   }
 }
 
-const student1 = new Student('Alice Johnson', 2000, 'Computer Science');
-student1.introduce();
-student1.calcAge();
+const student1 = new Student('Alice Johnson', 2000, 'Computer Science')
+student1.introduce()
+student1.calcAge()
 ```
 
 ## 最后总结
@@ -3383,41 +3631,43 @@ student1.calcAge();
 将 JSON 字符串转换为 JavaScript 对象。
 
 ```js
-const jsonString = '{"name": "Akbar", "age": 24, "isStudent": false}';
-const jsonObj = JSON.parse(jsonString);
-console.log(jsonObj);
+const jsonString = '{"name": "Akbar", "age": 24, "isStudent": false}'
+const jsonObj = JSON.parse(jsonString)
+console.log(jsonObj)
 ```
 
 ## JSON.stringify()
+
 将 JavaScript 对象转换为 JSON 字符串。
 
 ```js
-const jsonObj = { name: 'Akbar', age: 24, isStudent: false };
-const jsonString = JSON.stringify(jsonObj);
-console.log(jsonString);
+const jsonObj = { name: 'Akbar', age: 24, isStudent: false }
+const jsonString = JSON.stringify(jsonObj)
+console.log(jsonString)
 ```
 
 # Object 命名空间
 
 {% note primary modern %}
-`Object`是JavaScript的引用数据类型。
+`Object`是 JavaScript 的引用数据类型。
 `Object` 命名空间包含用于操作对象的各种方法和属性。
 {% endnote %}
 
 ## Object.keys()
+
 返回一个包含对象所有可枚举属性名称的数组。
 
 ```js
-const obj = { name: 'Akbar', age: 24, isStudent: false };
-const keys = Object.keys(obj);
-console.log(keys);
+const obj = { name: 'Akbar', age: 24, isStudent: false }
+const keys = Object.keys(obj)
+console.log(keys)
 
 // 输出： ['name', 'age', 'isStudent']
 ```
 
 # Asynchronous JavaScript
 
-## 什么是Synchronous JavaScript？
+## 什么是 Synchronous JavaScript？
 
 同步 JavaScript 是指代码按顺序执行，一行接一行，直到所有代码执行完毕。在同步执行中，后续代码必须等待前面的代码执行完成后才能继续执行。这种方式简单直观，但在处理耗时操作（如网络请求、文件读取等）时，可能会导致阻塞，影响用户体验。
 
@@ -3432,7 +3682,7 @@ p.style.color = 'red';
 
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251208143704074.png)
 
-## 什么是Asynchronous JavaScript？
+## 什么是 Asynchronous JavaScript？
 
 异步 JavaScript 是指代码可以在不阻塞主线程的情况下执行。异步操作允许程序在等待某些任务完成（如网络请求、定时器等）时，继续执行其他代码，从而提高应用的响应性和性能。异步编程通常使用回调函数、Promises 或 async/await 来处理异步操作的结果。
 
@@ -3452,12 +3702,12 @@ p.style.color = 'red'; // 立即执行，不会被阻塞
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251208144613389.png)
 
 ```js
-const img = document.querySelector('img');
-img.src = 'large-image.jpg'; // 加载大图是异步的
-img.addEventListener('load', function() {
-  console.log('Image loaded!');
-});
-p.style.border = '2px solid black'; // 立即执行
+const img = document.querySelector('img')
+img.src = 'large-image.jpg' // 加载大图是异步的
+img.addEventListener('load', function () {
+  console.log('Image loaded!')
+})
+p.style.border = '2px solid black' // 立即执行
 ```
 
 ## AJAX
@@ -3475,21 +3725,22 @@ AJAX（Asynchronous JavaScript and XML）是一种用于在不重新加载整个
 {% btn
  'https://developer.mozilla.org/zh-CN/docs/Web/API/XMLHttpRequest',
  'MDN 文档',
- far fa-hand-point-right,blue larger 
+ far fa-hand-point-right,blue larger
 %}
 
 比如：
-```js
-  const request = new XMLHttpRequest();
-  request.open('GET', `https://restcountries.com/v3.1/name/${name}`);
-  request.send(); // 发送请求，但不会阻塞代码运行，因为这个操作在后台进行。
-  // 所以不能简单接受请求发送后就立刻使用数据
-  // const response = request.send() // 不能这样写, 因为异步操作的结果不能立刻获得
 
-  request.addEventListener('load', function () {
-    const [data] = JSON.parse(this.responseText);
-    console.log(data);
-  });
+```js
+const request = new XMLHttpRequest()
+request.open('GET', `https://restcountries.com/v3.1/name/${name}`)
+request.send() // 发送请求，但不会阻塞代码运行，因为这个操作在后台进行。
+// 所以不能简单接受请求发送后就立刻使用数据
+// const response = request.send() // 不能这样写, 因为异步操作的结果不能立刻获得
+
+request.addEventListener('load', function () {
+  const [data] = JSON.parse(this.responseText)
+  console.log(data)
+})
 ```
 
 ## Callback Hell(回调地狱)
@@ -3498,25 +3749,27 @@ AJAX（Asynchronous JavaScript and XML）是一种用于在不重新加载整个
 比如，下一个操作依赖于上一个操作的结果，而上一个操作又是异步的，这样就会导致回调函数嵌套。
 
 比如：
+
 ```js
 setTimeout(() => {
-  console.log('1 second passed');
+  console.log('1 second passed')
   setTimeout(() => {
-    console.log('2 seconds passed');
+    console.log('2 seconds passed')
     setTimeout(() => {
-      console.log('3 seconds passed');
+      console.log('3 seconds passed')
       setTimeout(() => {
-        console.log('4 seconds passed');
-      }, 1000);
-    }, 1000);
-  }, 1000);
-}, 1000);
+        console.log('4 seconds passed')
+      }, 1000)
+    }, 1000)
+  }, 1000)
+}, 1000)
 ```
 
 又比如：
+
 ```js
-const btn = document.querySelector('.btn-country');
-const countriesContainer = document.querySelector('.countries');
+const btn = document.querySelector('.btn-country')
+const countriesContainer = document.querySelector('.countries')
 
 const renderCountry = function (data, className = '') {
   const html = `
@@ -3535,102 +3788,96 @@ const renderCountry = function (data, className = '') {
               data.currencies[Object.keys(data.currencies)[0]].name
             }</p>
           </div>
-        </article>`;
+        </article>`
 
-  countriesContainer.insertAdjacentHTML('beforeend', html);
-  countriesContainer.style.opacity = 1;
-};
+  countriesContainer.insertAdjacentHTML('beforeend', html)
+  countriesContainer.style.opacity = 1
+}
 
 // 回调地狱示例代码
 const getCountryAndNeighbor = function (name) {
   // AJAX 1
-  const request = new XMLHttpRequest();
-  request.open('GET', `https://restcountries.com/v3.1/name/${name}`);
-  request.send();
+  const request = new XMLHttpRequest()
+  request.open('GET', `https://restcountries.com/v3.1/name/${name}`)
+  request.send()
 
   request.addEventListener('load', function () {
-    const [data] = JSON.parse(this.responseText);
-    console.log(data);
+    const [data] = JSON.parse(this.responseText)
+    console.log(data)
 
     // 渲染本国
-    renderCountry(data);
+    renderCountry(data)
 
     // 获取邻国
-    const [neighbor] = data.borders;
-    console.log(neighbor);
-    if (!neighbor) return;
+    const [neighbor] = data.borders
+    console.log(neighbor)
+    if (!neighbor) return
 
     // AJAX 2
-    const request2 = new XMLHttpRequest();
-    request2.open('GET', `https://restcountries.com/v3.1/alpha/${neighbor}`);
-    request2.send();
+    const request2 = new XMLHttpRequest()
+    request2.open('GET', `https://restcountries.com/v3.1/alpha/${neighbor}`)
+    request2.send()
 
     request2.addEventListener('load', function () {
-      const [data2] = JSON.parse(this.responseText);
-      console.log(data2);
-      renderCountry(data2, 'neighbour');
+      const [data2] = JSON.parse(this.responseText)
+      console.log(data2)
+      renderCountry(data2, 'neighbour')
 
-      const [neighbor2] = data2.borders;
-      console.log(neighbor2);
-      if (!neighbor2) return;
+      const [neighbor2] = data2.borders
+      console.log(neighbor2)
+      if (!neighbor2) return
 
       // AJAX 3
-      const request3 = new XMLHttpRequest();
-      request3.open('GET', `https://restcountries.com/v3.1/alpha/${neighbor2}`);
-      request3.send();
+      const request3 = new XMLHttpRequest()
+      request3.open('GET', `https://restcountries.com/v3.1/alpha/${neighbor2}`)
+      request3.send()
 
       request3.addEventListener('load', function () {
-        const [data3] = JSON.parse(this.responseText);
-        console.log(data3);
-        renderCountry(data3, 'neighbour');
+        const [data3] = JSON.parse(this.responseText)
+        console.log(data3)
+        renderCountry(data3, 'neighbour')
 
-        const [neighbor3] = data3.borders;
-        console.log(neighbor3);
-        if (!neighbor3) return;
+        const [neighbor3] = data3.borders
+        console.log(neighbor3)
+        if (!neighbor3) return
 
         // AJAX 4
-        const request4 = new XMLHttpRequest();
-        request4.open(
-          'GET',
-          `https://restcountries.com/v3.1/alpha/${neighbor3}`
-        );
-        request4.send();
+        const request4 = new XMLHttpRequest()
+        request4.open('GET', `https://restcountries.com/v3.1/alpha/${neighbor3}`)
+        request4.send()
         request4.addEventListener('load', function () {
-          const [data4] = JSON.parse(this.responseText);
-          console.log(data4);
-          renderCountry(data4, 'neighbour');
+          const [data4] = JSON.parse(this.responseText)
+          console.log(data4)
+          renderCountry(data4, 'neighbour')
 
-          const [neighbor4] = data4.borders;
-          console.log(neighbor4);
-          if (!neighbor4) return;
+          const [neighbor4] = data4.borders
+          console.log(neighbor4)
+          if (!neighbor4) return
 
           // AJAX 5
-          const request5 = new XMLHttpRequest();
-          request5.open(
-            'GET',
-            `https://restcountries.com/v3.1/alpha/${neighbor4}`
-          );
-          request5.send();
+          const request5 = new XMLHttpRequest()
+          request5.open('GET', `https://restcountries.com/v3.1/alpha/${neighbor4}`)
+          request5.send()
           request5.addEventListener('load', function () {
-            const [data5] = JSON.parse(this.responseText);
-            console.log(data5);
-            renderCountry(data5, 'neighbour');
-          });
-        });
-      });
-    });
-  });
-};
+            const [data5] = JSON.parse(this.responseText)
+            console.log(data5)
+            renderCountry(data5, 'neighbour')
+          })
+        })
+      })
+    })
+  })
+}
 
 // getCountryAndNeighbor('portugal');
-getCountryAndNeighbor('china');
+getCountryAndNeighbor('china')
 ```
 
 ## Promises
 
 Promise 是 JavaScript 中用于处理异步操作的一种机制。它表示一个可能在未来某个时间点完成或失败的操作，并允许你注册回调函数来处理这些结果。Promise 有三种状态：待定（pending）、已完成（fulfilled）和已拒绝（rejected）。
 
-Promise是属于微任务队列的。所以当主线程执行完同步代码后，会先去执行微任务队列中的任务，再去执行宏任务队列中的任务。
+Promise 是属于微任务队列的。所以当主线程执行完同步代码后，会先去执行微任务队列中的任务，再去执行宏任务队列中的任务。
 
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251208163144529.png)
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251208163714981.png)
@@ -3640,8 +3887,8 @@ Promise是属于微任务队列的。所以当主线程执行完同步代码后�
 如果你有一个返回 Promise 的函数，比如``fetch()` api，你可以使用 `.then()` 方法来处理成功的结果，使用 `.catch()` 方法来处理错误。
 
 ```js
-const btn = document.querySelector('.btn-country');
-const countriesContainer = document.querySelector('.countries');
+const btn = document.querySelector('.btn-country')
+const countriesContainer = document.querySelector('.countries')
 
 const renderCountry = function (data, className = '') {
   const html = `
@@ -3660,29 +3907,29 @@ const renderCountry = function (data, className = '') {
               data.currencies[Object.keys(data.currencies)[0]].name
             }</p>
           </div>
-        </article>`;
+        </article>`
 
-  countriesContainer.insertAdjacentHTML('beforeend', html);
-  countriesContainer.style.opacity = 1;
-};
+  countriesContainer.insertAdjacentHTML('beforeend', html)
+  countriesContainer.style.opacity = 1
+}
 
 // Consuming Promises
 const getCountryData = function (name) {
   fetch(`https://restcountries.com/v3.1/name/${name}`)
     .then(function (response) {
       // 假设promise状态是fulfilled
-      console.log(response);
+      console.log(response)
       // 所有的response对象都有一个.json()方法, 这个方法也是异步的, 它同样会返回一个promise
       // 因为json（）方法也是异步，我们接下来也返回一个promise
-      return response.json();
+      return response.json()
     })
     .then(function (data) {
-      console.log(data);
-      renderCountry(data[0]);
-    });
-};
+      console.log(data)
+      renderCountry(data[0])
+    })
+}
 
-getCountryData('portugal');
+getCountryData('portugal')
 ```
 
 **链式调用，下一个请求依赖上一个请求的结果：**
@@ -3692,95 +3939,94 @@ const getCountryData = function (name) {
   fetch(`https://restcountries.com/v3.1/name/${name}`)
     .then(response => response.json())
     .then(data => {
-      renderCountry(data[0]);
+      renderCountry(data[0])
       // console.log(data);
-      const neighbor = data[0].borders?.[0];
-      console.log(neighbor);
-      if (!neighbor) return;
+      const neighbor = data[0].borders?.[0]
+      console.log(neighbor)
+      if (!neighbor) return
 
       // 获取邻国数据, 返回一个新的fetch的promise
-      return fetch(`https://restcountries.com/v3.1/alpha/${neighbor}`);
+      return fetch(`https://restcountries.com/v3.1/alpha/${neighbor}`)
     }) // 上面返回的promise，就是下面then的输入，比如下面的response
     .then(response => response.json())
-    .then(data => renderCountry(data[0], 'neighbour'));
-};
+    .then(data => renderCountry(data[0], 'neighbour'))
+}
 
-getCountryData('portugal');
+getCountryData('portugal')
 ```
 
 **简单的处理错误**：
+
 ```js
 const getCountryData = function (name) {
   fetch(`https://restcountries.com/v3.1/name/${name}`)
     .then(
-      response => response.json()
+      response => response.json(),
       // err => window.alert(err) // 一个一个处理错误（不推荐）
     )
     .then(data => {
-      renderCountry(data[0]);
-      const neighbor = data[0].borders?.[0];
-      console.log(neighbor);
-      if (!neighbor) return;
+      renderCountry(data[0])
+      const neighbor = data[0].borders?.[0]
+      console.log(neighbor)
+      if (!neighbor) return
 
-      return fetch(`https://restcountries.com/v3.1/alpha/${neighbor}`);
-    }) 
+      return fetch(`https://restcountries.com/v3.1/alpha/${neighbor}`)
+    })
     .then(response => response.json())
     .then(data => renderCountry(data[0], 'neighbour'))
-  .catch(err => {   // catch会自动返回promise
+    .catch(err => {
+      // catch会自动返回promise
       // 一次性处理错误（推荐）
-      console.error(`${err} 💥💥`);
-      renderError(`Something went wrong 💥💥 ${err.message}. Try again!`);
+      console.error(`${err} 💥💥`)
+      renderError(`Something went wrong 💥💥 ${err.message}. Try again!`)
     })
-    .finally(() =>{
+    .finally(() => {
       // 无论成功还是失败，都会执行
-    });
-};
+    })
+}
 ```
 
 **抛出错误**：
+
 ```js
 // 显示错误
 const renderError = function (msg) {
-  countriesContainer.insertAdjacentText('beforeend', msg);
-};
+  countriesContainer.insertAdjacentText('beforeend', msg)
+}
 
 // 错误处理
 const getJson = function (url, errorMessage = 'Something went wrong') {
   return fetch(url).then(response => {
-    if (!response.ok) throw new Error(`${errorMessage} (${response.status})`);
+    if (!response.ok) throw new Error(`${errorMessage} (${response.status})`)
 
-    return response.json();
-  });
-};
+    return response.json()
+  })
+}
 
 const getCountryData = function (name) {
-     getJson(`https://restcountries.com/v3.1/name/${name}`, 'Country not found')
+  getJson(`https://restcountries.com/v3.1/name/${name}`, 'Country not found')
     .then(data => {
-      renderCountry(data[0]);
-      const neighbor = data[0].borders?.[0];
+      renderCountry(data[0])
+      const neighbor = data[0].borders?.[0]
 
-      if (!neighbor) throw new Error('No neighbor found!');
+      if (!neighbor) throw new Error('No neighbor found!')
 
-      return getJson(
-        `https://restcountries.com/v3.1/alpha/${neighbor}`,
-        'Country not found'
-      );
+      return getJson(`https://restcountries.com/v3.1/alpha/${neighbor}`, 'Country not found')
     })
     .then(data => renderCountry(data[0], 'neighbour'))
     .catch(err => {
-      console.error(`${err} 💥💥`);
-      renderError(`Something went wrong 💥💥 ${err.message}. Try again!`);
+      console.error(`${err} 💥💥`)
+      renderError(`Something went wrong 💥💥 ${err.message}. Try again!`)
     })
     .finally(() => {
-      countriesContainer.style.opacity = 1;
-    });
-};
+      countriesContainer.style.opacity = 1
+    })
+}
 
 btn.addEventListener('click', function () {
-  getCountryData('australia');
-});
+  getCountryData('australia')
+})
 ```
-
 
 ### Building Promises
 
@@ -3790,24 +4036,25 @@ btn.addEventListener('click', function () {
 // 创建一个promise
 // 参数函数叫executor
 const lotteryPromise = new Promise(function (resolve, reject) {
-  console.log('Lottery draw is happening 🔮');
+  console.log('Lottery draw is happening 🔮')
 
   // 用定时器模拟异步操作, 否则就是同步操作
   setTimeout(() => {
     if (Math.random() >= 0.5) {
       // fulfilled, 参数可以通过.then()访问
-      resolve('You WIN 💰');
+      resolve('You WIN 💰')
     } else {
       // rejected, 参数可以通过.catch()访问
-      reject(new Error('You LOSE 💩'));
+      reject(new Error('You LOSE 💩'))
     }
-  }, 2000);
-});
+  }, 2000)
+})
 
 // Consuming the promise
-lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
+lotteryPromise.then(res => console.log(res)).catch(err => console.error(err))
 console.log('---')
 ```
+
 > 其实这段代码是同步和异步混合执行的，我们来一步步拆解：
 > 同步部分：new Promise(...) 构造函数本身以及传递给它的那个函数（executor function）是同步执行的。
 > 所以，当这段代码运行时，console.log('Lottery draw is happening 🔮') 会立刻被打印出来。
@@ -3820,82 +4067,86 @@ console.log('---')
 将基于回调的异步函数转换为返回 Promise 的函数。
 
 比如下面这是基于回调的异步函数：
+
 ```js
 setTimeout(() => {
-  console.log('1 second passed');
+  console.log('1 second passed')
   setTimeout(() => {
-    console.log('2 seconds passed');
+    console.log('2 seconds passed')
     setTimeout(() => {
-      console.log('3 seconds passed');
+      console.log('3 seconds passed')
       setTimeout(() => {
-        console.log('4 seconds passed');
-      }, 1000);
-    }, 1000);
-  }, 1000);
-}, 1000);
+        console.log('4 seconds passed')
+      }, 1000)
+    }, 1000)
+  }, 1000)
+}, 1000)
 ```
 
 你可以把它改写成返回 Promise 的函数：
+
 ```js
 // Promisifying setTimeout
 const wait = function (seconds) {
   // 不需要reject，因为定时器不会失败
   return new Promise(function (resolve) {
-    setTimeout(resolve, seconds * 1000);
-  });
-};
+    setTimeout(resolve, seconds * 1000)
+  })
+}
 
 wait(1)
   .then(() => {
-    console.log('1 second passed');
-    return wait(1);
+    console.log('1 second passed')
+    return wait(1)
   })
   .then(() => {
-    console.log('2 seconds passed');
-    return wait(1);
+    console.log('2 seconds passed')
+    return wait(1)
   })
   .then(() => {
-    console.log('3 seconds passed');
-    return wait(1);
+    console.log('3 seconds passed')
+    return wait(1)
   })
-  .then(() => console.log('4 seconds passed'));
+  .then(() => console.log('4 seconds passed'))
 ```
 
-**快速创建fullfilled或者rejected的Promise**：
+**快速创建 fullfilled 或者 rejected 的 Promise**：
+
 ```js
 // Promise.resolve, 立刻执行并返回一个成功的promise
-Promise.resolve('abc').then(x => console.log(x));
+Promise.resolve('abc').then(x => console.log(x))
 // Promise.reject, 立刻执行并返回一个失败的promise
-Promise.reject(new Error('Problem!')).catch(x => console.error(x));
+Promise.reject(new Error('Problem!')).catch(x => console.error(x))
 ```
 
-**把callback base异步函数转化成Promise异步函数**：
+**把 callback base 异步函数转化成 Promise 异步函数**：
 
 ```js
 // callback base 异步获取地理位置
 window.navigator.geolocation.getCurrentPosition(
   position => console.log(position),
-  err => console.error(err)
-);
+  err => console.error(err),
+)
 
 // Promise base 获取地理位置
 const getPosition = function () {
   return new Promise(function (resolve, reject) {
     window.navigator.geolocation.getCurrentPosition(
       position => resolve(position),
-      err => reject(err)
-    );
-  });
-};
+      err => reject(err),
+    )
+  })
+}
 
 getPosition()
   .then(pos => console.log(pos))
-  .catch(err => console.error(err));
+  .catch(err => console.error(err))
 ```
+
 简化代码：
+
 ```js
-position => resolve(position),
-err => reject(err)
+position => resolve(position), err => reject(err)
 
 // 可以简化为：
 // resolve,
@@ -3904,56 +4155,249 @@ err => reject(err)
 // 比如
 const getPosition = function () {
   return new Promise(function (resolve, reject) {
-    window.navigator.geolocation.getCurrentPosition(resolve, reject);
-  });
-};
+    window.navigator.geolocation.getCurrentPosition(resolve, reject)
+  })
+}
 ```
 
 ## Async/Await
 
 `async` 和 `await` 是 JavaScript 中用于处理异步操作的关键字。它们使得异步代码看起来更像同步代码，从而提高了代码的可读性和可维护性。
 
-需要注意的是，这只是语法糖，底层依然是基于 Promise 实现的。比如，背后还是then(),catch()在起作用。
+需要注意的是，这只是语法糖，底层依然是基于 Promise 实现的。比如，背后还是 then(),catch()在起作用。
 
 ```js
 const renderError = function (msg) {
-  countriesContainer.insertAdjacentText('beforeend', msg);
-};
+  countriesContainer.insertAdjacentText('beforeend', msg)
+}
 
 // Async / Await
 // 用async声明这个函数是异步的
 const getCountryData = async function (country) {
   try {
     // await 等待这个promise完成，所以我们可以拿到异步操作后的结果
-    const response = await fetch(
-      `https://restcountries.com/v3.1/name/${country}`
-    );
+    const response = await fetch(`https://restcountries.com/v3.1/name/${country}`)
 
-    if (!response.ok) throw new Error(`Country not found (${response.status})`);
+    if (!response.ok) throw new Error(`Country not found (${response.status})`)
 
     // 解析json也是异步的，所以也要await
-    const [data] = await response.json();
-    renderCountry(data);
+    const [data] = await response.json()
+    renderCountry(data)
   } catch (err) {
-    console.error(`${err} 💥💥`);
-    renderError(`Something went wrong 💥💥 ${err.message}. Try again!`);
+    console.error(`${err} 💥💥`)
+    renderError(`Something went wrong 💥💥 ${err.message}. Try again!`)
   } finally {
-    countriesContainer.style.opacity = 1;
+    countriesContainer.style.opacity = 1
   }
-};
+}
 
 btn.addEventListener('click', function () {
-  getCountryData('germany');
-});
+  getCountryData('germany')
+})
 ```
 
+## Async 函数返回什么？
+
+`async` 函数总是返回一个 Promise。如果函数内部返回一个值，这个值会被自动包装成一个已解决的 Promise；如果函数抛出一个错误，这个错误会被包装成一个已拒绝的 Promise。
+
+```js
+// Async / Await
+const getCountryData = async function (country) {
+  try {
+    const response = await fetch(`https://restcountries.com/v3.1/name/${country}`)
+
+    if (!response.ok) throw new Error(`Country not found (${response.status})`)
+
+    const [data] = await response.json()
+    renderCountry(data)
+
+    // 返回值会被包装在一个fulfilled的promise里
+    return `You are in ${data.name.common}`
+  } catch (err) {
+    console.error(`${err} 💥💥`)
+    renderError(`Something went wrong 💥💥 ${err.message}. Try again!`)
+  } finally {
+    countriesContainer.style.opacity = 1
+  }
+}
+
+btn.addEventListener('click', function () {
+  console.log('btn clicked')
+  const name = getCountryData('germany')
+  console.log(name) // Promise {<pending>}
+  console.log('getCountryData called')
+})
+```
+
+可以通过 then 获取 fullfilled 值：
+
+```js
+getCountryData('germany').then(msg => console.log(msg))
+```
+
+为什么这里不用 await 呢？因为 await 只能在 async 函数内部使用。
+
+如果还是喜欢使用 async/await 的语法，可以这样写：
+
+```js
+// IIFE
+// 立即调用异步函数
+;(async function () {
+  const msg = await getCountryData('portugal')
+  console.log(msg)
+})()
+```
+
+## 多个 Promise 并行执行
+
+下面是一种不推荐的写法：
+
+```js
+const getJson = function (url, errorMessage = 'Something went wrong') {
+  return fetch(url).then(response => {
+    if (!response.ok) throw new Error(`${errorMessage} (${response.status})`)
+
+    return response.json()
+  })
+}
+
+const get3Countries = async function (c1, c2, c3) {
+  try {
+    // 按顺序执行，虽然下一个请求不依赖于上一个请求的结果
+    const [data1] = await getJson(`https://restcountries.com/v3.1/name/${c1}`)
+    const [data2] = await getJson(`https://restcountries.com/v3.1/name/${c2}`)
+    const [data3] = await getJson(`https://restcountries.com/v3.1/name/${c3}`)
+    console.log([data1.capital[0], data2.capital[0], data3.capital[0]])
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+get3Countries('germany', 'usa', 'china')
+```
+
+推荐的写法是用`Promise.all()`，这个函数的参数是一个 promise 数组，返回一个新的 promise，这个新的 promise 在所有的 promise 都 fulfilled 后才会 fulfilled。如果某个 promise 发生 rejected，那么整个 promise.all 都是 rejected。
+
+```js
+const get3Countries = async function (c1, c2, c3) {
+  try {
+    // 并行执行
+    const [[data1], [data2], [data3]] = await Promise.all([
+      getJson(`https://restcountries.com/v3.1/name/${c1}`),
+      getJson(`https://restcountries.com/v3.1/name/${c2}`),
+      getJson(`https://restcountries.com/v3.1/name/${c3}`),
+    ])
+    console.log([data1.capital[0], data2.capital[0], data3.capital[0]])
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+get3Countries('germany', 'usa', 'china')
+```
+
+## 一些常用的 Promise 组合方法
+
+### Promise.race()
+
+这个方法的参数是一个 promise 数组，返回这数组里面第一个 fullfilled 的 promise。
+
+我们通过这个方法，可以设置请求超时事件。
+
+```js
+const timeout = function (sec) {
+  return new Promise(function (_, reject) {
+    setTimeout(function () {
+      reject(new Error('Request took too long!'))
+    }, sec * 1000)
+  })
+}
+
+Promise.race([getJson('https://restcountries.com/v3.1/name/egypt'), timeout(0.3)])
+  .then(res => console.log(res[0]))
+  .catch(err => console.error(err))
+```
+
+### Promise.allSettled()
+
+这个方法的参数是一个 promise 数组，返回一个新的 promise，这个新的 promise 在所有的 promise 都 settled（不管是 fulfilled 还是 rejected）后才会 fulfilled。返回值是一个对象数组，表示每个 promise 的结果状态。
+
+```js
+Promise.allSettled([
+  Promise.resolve('Success'),
+  Promise.reject('Error'),
+  Promise.resolve('Another success'),
+]).then(res => console.log(res))
+```
+
+# MODULES
+
+{% btn
+ 'https://juejin.cn/post/7445507443868172323',
+ '掘金链接',
+ far fa-hand-point-right,blue larger
+%}
+
+# NPM
+
+## 初始化
+
+```bash
+npm init
+```
+
+然后产生一个`package.json`文件。
+
+```json
+{
+  "name": "16-asynchronous",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Akbar",
+  "license": "ISC",
+  "description": "Akbar's Asynchronous JavaScript Project"
+}
+```
+
+## 安装依赖
+
+- **生产依赖：**生产依赖是指在应用程序运行时所需的库或模块。这些依赖对于应用程序的核心功能是必不可少的。生产依赖通常会被包含在最终的部署包中，以确保应用程序在生产环境中能够正常运行。
+
+```bash
+npm install lodash-es --save
+```
+
+默认就是`--save`，所以可以省略。
+
+- **开发依赖：**开发依赖是指在开发过程中所需的库或工具，这些依赖对于应用程序的运行并不是必需的。它们通常用于测试、构建、代码质量检查等任务。开发依赖不会被包含在最终的部署包中，因为它们只在开发环境中使用。
+
+```bash
+npm install jest --save-dev
+```
+
+- **安装全部依赖**
+
+```bash
+npm install
+```
+
+## 使用已安装的包
+
+默认指向的就是`node_modules`目录下的包。
+
+```js
+import deepClone from 'lodash-es/cloneDeep.js'
+```
 
 # PUBLIC API
 
 {% btn
  'https://github.com/public-apis/public-apis',
  'Public APIs 列表(GitHub)',
- far fa-hand-point-right,blue larger 
+ far fa-hand-point-right,blue larger
 %}
 
 1. **获取国家信息**：搜索`REST Countries`
