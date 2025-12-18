@@ -2042,11 +2042,12 @@ document.addEventListener('keyup', function (event) {
 | `mouseleave` | 鼠标离开事件                                                    |
 | `keyup`      | 键盘按键释放事件                                                |
 | `keydown`    | 键盘按键按下事件                                                |
-| `input`      | 输入框内容变化事件                                              |
-| `change`     | 输入框内容改变并失去焦点事件（可以用来监听 checkbox, radio 等） |
-| `load`       | 页面或资源加载完成事件                                          |
+| `input`      | 输入框内容变化事件                                               |
+| `change`     | 输入框内容改变并失去焦点事件（可以用来监听 checkbox, radio 等）       |
+| `blur`       | 元素失去焦点事件（可以用来对input进行校验）                          |
+| `load`       | 页面或资源加载完成事件                                            |
 | `submit`     | 表单提交事件(form 提交)                                         |
-| `error`      | 发生错误时触发的事件                                            |
+| `error`      | 发生错误时触发的事件                                             |
 
 ## 事件绑定
 
@@ -3739,6 +3740,24 @@ request.send() // 发送请求，但不会阻塞代码运行，因为这个操�
 
 request.addEventListener('load', function () {
   const [data] = JSON.parse(this.responseText)
+  console.log(data)
+})
+```
+
+### Fetch API
+
+Fetch API 是现代浏览器中用于发起网络请求的接口，提供了更简洁和强大的方式来处理异步请求。它基于 Promise，使得处理异步操作更加直观和易于管理。
+
+```js
+fetch('https:example.com/data', {
+  method: 'POST', // 或 'POST', 'PUT', 'DELETE' 等
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ key: 'value' }), // 仅在 POST 或 PUT 请求中使用
+}).then(function(response) {
+  return response.json()
+}).then(function(data) {
   console.log(data)
 })
 ```

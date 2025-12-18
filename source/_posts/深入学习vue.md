@@ -455,6 +455,9 @@ setTimeout(function () {
 }, 3000)
 ```
 
+- `created`：在实例创建完成后被调用，此时数据和事件配置已经完成，但 DOM 还未挂载。
+- `mounted`：在实例挂载到 DOM 后被调用，此时可以访问和操作 DOM 元素。
+
 # component 组件基础
 
 ```js
@@ -680,6 +683,7 @@ export default {
   props: ['id', 'topicName', 'description'],
 }
 </script>
+
 {%endcodeblock%}
 
 {% note warning flat %}
@@ -709,15 +713,13 @@ export default {
 </template>
 ```
 
-# 组件身上的attributes 和 listeners
+# 组件身上的 attributes 和 listeners
 
 {% btn
  'https://vuejs.org/guide/components/attrs.html#fallthrough-attributes',
  'Vue官方文档-组件身上的attributes',
  far fa-hand-point-right,blue
 %}
-
-
 
 # Slots 插槽
 
@@ -756,7 +758,7 @@ export default {
  far fa-hand-point-right,blue
 %}
 
-vue官网是这样说的：
+vue 官网是这样说的：
 {% note warning flat %}
 **TIP**
 
@@ -775,5 +777,515 @@ The teleport to target must be already in the DOM when the `<Teleport>` componen
 
 {% note warning flat %}
 注意：
-这个最佳实践官方已标记为`outdated`，可能对于composition API不适用。
+这个最佳实践官方已标记为`outdated`，可能对于 composition API 不适用。
+{% endnote %}
+
+# Form Controls
+
+## Form Bindings
+
+{% btn
+ 'https://vuejs.org/guide/essentials/forms.html#form-input-bindings',
+ 'Vue官方文档-Form Bindings',
+ far fa-hand-point-right,blue
+%}
+
+## Component v-model
+
+{% btn
+ 'https://vuejs.org/guide/components/v-model.html#component-v-model',
+ 'Vue官方文档-Component v-model',
+ far fa-hand-point-right,blue
+%}
+
+> 我们发现一个规律，自定义组件中使用v-model，响应式数据一般都在父组件中定义，然后通过prop传递给子组件，子组件通过事件把数据传递回父组件。
+
+**下面介绍一个坑：**
+
+父组件：
+{% codeblock lang:js mark:28 %}
+<script>
+  import RatingControl from './RatingControl.vue'
+
+  export default {
+    components: {
+      RatingControl,
+    },
+
+    data() {
+      return {
+        rating: null,
+      }
+    },
+
+    methods: {
+      submitForm() {
+        console.log('rating:', this.rating)
+        this.rating = null
+      },
+    },
+  }
+</script>
+
+<template>
+  <form class="demo-form" @submit.prevent="submitForm">
+    <div class="field">
+      <label class="label-text">Rate our website</label>
+      <RatingControl :model-value="rating" @update:model-value="rating = $event" />
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn-save">Save Data</button>
+    </div>
+  </form>
+</template>
+
+<!-- 样式省略 -->
+{%endcodeblock%}
+
+子组件：
+{% codeblock lang:js mark:8 %}
+<script>
+export default {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+
+  data() {
+    return {
+      activeOption: this.modelValue, // 组件创建的时候只执行一次这个赋值操作
+    }
+  },
+
+  methods: {
+    activate(option) {
+      this.activeOption = option
+      this.$emit('update:modelValue', option)
+    }
+  }
+}
+</script>
+
+<template>
+  <ul>
+    <li>
+      <button type="button" @click="activate('poor')" :class="{ active: activeOption === 'poor' }">
+        Poor
+      </button>
+    </li>
+    <li>
+      <button
+        type="button"
+        @click="activate('average')"
+        :class="{ active: activeOption === 'average' }"
+      >
+        Average
+      </button>
+    </li>
+    <li>
+      <button
+        type="button"
+        @click="activate('great')"
+        :class="{ active: activeOption === 'great' }"
+      >
+        Great
+      </button>
+    </li>
+  </ul>
+</template>
+{%endcodeblock%}
+
+现在我遇到的问题是：为什么我点击提交按钮提交的时候，子组件的`activeOption`不会被清零？按理来说：当按下提交按钮的时候父组件把一个清零的prop，也就是`:model-value="rating`作为prop传递给子组件，然后子组件拿着这个值赋值给`activeOption`，`activeOption`应该被清零才对啊？
+
+**原因分析**：
+在子组件中，`activeOption` 只在组件创建时被初始化为 `this.modelValue` 的值。要注意，每个vue组件都有自己独立的响应式数据（data（））返回的数据，他不会随着某个prop的变化而自动变化。
+
+**解决办法：**
+- 在子组件中使用`watch`监听`modelValue`的变化，然后在变化时更新`activeOption`。{% label 不推荐 orange %}
+- 直接在子组件的模板中使用`modelValue`，而不是在data中创建一个新的`activeOption`变量。{% label 推荐 green %}
+
+**下面用推荐的接办法来解决：**
+父组件：
+{% codeblock lang:js mark:28-29 %}
+<script>
+  import RatingControl from './RatingControl.vue'
+
+  export default {
+    components: {
+      RatingControl,
+    },
+
+    data() {
+      return {
+        rating: null,
+      }
+    },
+
+    methods: {
+      submitForm() {
+        console.log('rating:', this.rating)
+        this.rating = null
+      },
+    },
+  }
+</script>
+
+<template>
+  <form class="demo-form" @submit.prevent="submitForm">
+    <div class="field">
+      <label class="label-text">Rate our website</label>
+      <!-- <RatingControl :model-value="rating" @update:model-value="rating = $event" /> -->
+      <RatingControl v-model="rating" />    <!-- 推荐使用v-model语法糖 -->
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn-save">Save Data</button>
+    </div>
+  </form>
+</template>
+{%endcodeblock%}
+
+子组件：
+{% codeblock lang:js mark:3-4,8,17 %}
+<script>
+export default {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+
+  methods: {
+    activate(option) {
+      this.$emit('update:modelValue', option)
+    }
+  }
+}
+</script>
+
+<template>
+  <ul>
+    <li>
+      <button type="button" @click="activate('poor')" :class="{ active: modelValue === 'poor' }">
+        Poor
+      </button>
+    </li>
+    <li>
+      <button
+        type="button"
+        @click="activate('average')"
+        :class="{ active: modelValue === 'average' }"
+      >
+        Average
+      </button>
+    </li>
+    <li>
+      <button
+        type="button"
+        @click="activate('great')"
+        :class="{ active: modelValue === 'great' }"
+      >
+        Great
+      </button>
+    </li>
+  </ul>
+</template>
+{%endcodeblock%}
+
+# 表单校验
+
+可以利用`blur`事件来完成对表单的校验：
+
+```html
+<div class="field" :class="{ invalid: usernameValidity === 'invalid' }">
+  <label class="label-text" for="name">Your Name</label>
+  <input
+    id="name"
+    type="text"
+    name="name"
+    class="input"
+    placeholder="Enter your name"
+    v-model.trim="username"
+    @blur="validateInput"
+  />
+  <p v-if="usernameValidity === 'invalid'">Please enter your name.</p>
+</div>
+
+<style>
+  .field {
+    display: block;
+  }
+
+  .label-text {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #111827;
+  }
+
+  .input {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    background: #fff;
+    color: #0b1220;
+    box-sizing: border-box;
+  }
+
+  /* 校验失败样式 */
+  .field.invalid .input {
+    border-color: red;
+  }
+
+  .field.invalid p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: red;
+  }
+</style>
+```
+
+```js
+export default {
+  data() {
+    return {
+      username: '',
+      usernameValidity: 'pending',
+    }
+  },
+
+  methods: {
+    validateInput() {
+      if (this.username === '') {
+        this.usernameValidity = 'invalid'
+      } else {
+        this.usernameValidity = 'valid'
+      }
+    },
+  },
+}
+```
+
+# Vue-Router
+
+```js
+import { createApp } from 'vue'
+import App from './App.vue'
+import TeamsList from './components/teams/TeamsList.vue'
+import UsersList from './components/users/UsersList.vue'
+import { createRouter, createWebHistory } from 'vue-router'
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    {
+      path: '/teams',
+      name: 'Teams'
+      component: TeamsList,
+    },
+    {
+      path: '/users',
+      name: 'Users'
+      component: UsersList,
+    },
+  ],
+})
+
+
+const app = createApp(App)
+
+app.use(router)
+
+app.mount('#app')
+```
+
+history有三种模式：
+- createWebHistory()：HTML5 History 模式，URL 中没有 # 号，适合现代浏览器。
+- createWebHashHistory()：Hash 模式，URL 中有 # 号，适合不支持 HTML5 History API 的浏览器。
+- createMemoryHistory()：内存模式，主要用于服务器端渲染（SSR）。
+
+## 路由出口Router-View
+
+
+
+## 声明式导航router-link
+
+`router-link`会渲染成`<a>`标签。
+
+### path导航
+
+```html
+<!-- 根据path导航 -->
+<router-link to="/teams">Teams</router-link>
+```
+
+### name导航
+
+```html
+<!-- 根据name导航 -->
+<router-link :to="{ name: 'Teams' }">Teams</router-link>
+```
+
+### 修改激活状态样式
+
+激活状态的路由链接会自动添加`router-link-active`和`router-link-exact-active`类名，可以通过 CSS 来定义这些类名的样式。
+- `router-link-active`：当路由部分匹配时应用该类名。有嵌套路由时会应用该类名。
+- `router-link-exact-active`：当路由完全匹配时应用该类名。
+
+```css
+a:hover,
+a:active,
+a.router-link-active {
+  color: #f1a80a;
+}
+```
+
+如果想修改默认的类名，请参考官方文档：
+
+{% btn
+ 'https://router.vuejs.org/guide/essentials/active-links.html#Configuring-the-classes',
+ 'Vue-Router官方文档-修改激活状态样式',
+ far fa-hand-point-right,blue
+%}
+
+## 编程式导航
+
+{% btn
+ 'https://router.vuejs.org/guide/essentials/navigation.html',
+ 'Vue-Router官方文档-编程式导航',
+ far fa-hand-point-right,blue
+%}
+
+一旦我们把router挂到vue实例上，比如：`app.use(router)`，我们就可以全局拿到`this.$router`和`this.$route`。
+
+### $router
+
+- `this.$router`：路由器实例，可以用来编程式导航。
+
+```js
+this.$router.push('/teams')           // 根据路径导航
+this.$router.push({ name: 'Teams' }) // 根据路由名称导航
+```
+
+### $route
+
+- `this.$route`：当前路由的信息对象，可以用来访问当前路由的参数、查询字符串等信息。
+
+```js
+// 路由url是这样的：/users/:userId
+
+/**
+ * 获取路由参数userId
+ * 建议在created钩子函数中获取路由参数，因为此时路由信息已经准备好了
+ */
+this.$route.params.userId 
+```
+
+{% note warning flat %}
+**注意：**
+组合式api中使用路由器时，需要使用`useRouter`和`useRoute`来获取路由器实例和当前路由信息。因为组合式api中没有`this`上下文。
+但是在模板`<template>`中可以使用`$router`和`$route`，因为模板中有上下文。
+{% endnote %}
+
+### 把url参数作为props传递给组件
+
+```js
+    {
+      path: '/teams/:teamId',
+      component: TeamMembers,
+      props: true,
+    },
+```
+
+然后子组件可以直接通过props接收`teamId`。
+
+## 重定向和Alias
+
+{% btn
+ 'https://router.vuejs.org/guide/essentials/redirect-and-alias.html#Redirect-and-Alias',
+ 'Vue-Router官方文档-重定向和Alias',
+ far fa-hand-point-right,blue
+%}
+
+## 404或者未知路由
+
+```js
+    {
+      // 意思就是匹配所有(/)后面的内容，这里不一定要写notFound，可以是任意名称
+      // 注意，这个路由一定要放在最后面，因为路由是按照顺序进行匹配的
+      path: '/:notFound(.*)',
+      redirect: '/teams', 
+      // 或者
+      // component: NotFoundComponent,
+    },
+```
+
+## Scroll Behavior
+
+{% btn
+ 'https://router.vuejs.org/guide/advanced/scroll-behavior.html#Scroll-Behavior',
+ 'Vue-Router官方文档-Scroll Behavior',
+ far fa-hand-point-right,blue
+%}
+
+我们经常使用的应该是这个：
+```js
+const router = createRouter({
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  },
+})
+```
+
+## Navigation Guards
+
+{% btn
+ 'https://router.vuejs.org/guide/advanced/navigation-guards.html',
+ 'Vue-Router官方文档-Navigation Guards',
+ far fa-hand-point-right,blue
+%}
+
+- `to`：即将要进入的目标路由对象。
+- `from`：当前导航正要离开的路由对象。
+- `next`：一个函数，必须调用该函数来 resolve 这个钩子。
+
+看个例子：
+```js
+// GOOD
+router.beforeEach((to, from, next) => {
+  if (to.name !== 'Login' && !isAuthenticated) next({ name: 'Login' })
+  else next()
+})
+```
+上面的代码的意思是：如果用户没有认证，并且要去的路由不是登录页，那么就重定向到登录页，否则放行。
+
+# transition
+
+为什么要用vue提供的transition组件呢？我们使用css实现动画不行吗？
+
+我们使用vue的transition组件是因为：
+css动画只能在元素在DOM中时起作用，而vue的transition组件可以在元素进入和离开DOM时触发动画。
+比如一个模态框为例，如果用css动画实现，当模态框出现的时候可以实现动画，但是关闭模态框的时候，模态框会立即从DOM中移除，动画就无法实现了，而使用vue的transition组件可以在模态框离开DOM之前先执行动画，然后再移除DOM。
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251218144215624.png)
+
+transition组件默认有这些类名：
+
+**进入：**
+- `v-enter-from`：元素进入时的起始状态，
+- `v-enter-active`：元素进入时的过渡状态，
+- `v-enter-to`：元素进入时的结束状态，
+
+**离开：**
+- `v-leave-from`：元素离开时的起始状态，
+- `v-leave-active`：元素离开时的过渡状态，
+- `v-leave-to`：元素离开时的结束状态，
+
+{% note warning flat %}
+注意：
+
+transition组件只能有一个root组件。
+如果需要有两个组件，要保证在DOM上不能同时存在这两个组件，可以使用`mode`属性来控制组件的切换顺序。v-if来控制组件的显示和隐藏。
 {% endnote %}
