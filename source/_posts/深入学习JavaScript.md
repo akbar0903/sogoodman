@@ -559,6 +559,38 @@ const flatArr = arr.flat()
 console.log(flatArr)
 ```
 
+9. `sort`方法：对数组的元素进行排序，并返回排序后的数组。默认排序顺序是根据字符串Unicode码点。
+
+```js
+// Strings
+const owners = ['Jonas', 'Zach', 'Adam', 'Martha']
+// 根据字母顺序排序
+console.log(owners.sort()) 
+
+// Numbers
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300]
+// 默认排序是根据字符串Unicode码点，就是把数字也当作字符串排序
+console.log(movements.sort())
+
+/**
+ * 自定义排序函数，升序
+ * 如果 返回 < 0 ，a 会被排在 b 之前
+ * 如果 返回 > 0 ，b 会被排在 a 之前
+ */
+console.log(
+  movements.sort((a, b) => {
+    if (a > b) return 1
+    if (a < b) return -1
+  })
+)
+```
+
+{% btn
+ 'https://www.bilibili.com/video/BV1vA4y197C7?spm_id_from=333.788.videopod.episodes&vd_source=28e37be50df53ebbf04edfcc6228018f&p=153',
+ 'Jonas老师-数组sort方法',
+ far fa-hand-point-right,blue
+ %}
+
 **Array 方法总结：**
 
 ![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251203154436149.png)

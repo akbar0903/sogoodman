@@ -1289,3 +1289,517 @@ transition组件默认有这些类名：
 transition组件只能有一个root组件。
 如果需要有两个组件，要保证在DOM上不能同时存在这两个组件，可以使用`mode`属性来控制组件的切换顺序。v-if来控制组件的显示和隐藏。
 {% endnote %}
+
+# Composition API
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251220164229554.png)
+
+composition api 中不能拿到`this`，因为`setup`函数是在组件实例创建之前执行的，所以没有`this`上下文。
+
+# setup 函数
+
+```html
+<script>
+import { ref } from 'vue'
+
+export default {
+  setup() {
+    const username = ref('Akbar Tursun')
+    const age = ref(22)
+
+    setTimeout(function () {
+      username.value = 'Changed Name'
+      age.value = 30
+    }, 2000)
+
+    return {
+      username,
+      age,
+    }
+  },
+}
+</script>
+
+<template>
+  <h1>{{ username }}</h1>
+  <h1>{{ age }}</h1>
+</template>
+```
+
+## setup 语法糖
+
+{% btn
+ 'https://vuejs.org/guide/essentials/reactivity-fundamentals.html#script-setup',
+ 'Vue官方文档-setup 语法糖',
+ far fa-hand-point-right,blue
+ %}
+
+# Ref 和 Reactive
+
+ref 和 reactive 都是 Vue 3 中用于创建响应式数据的 API，但它们有一些关键的区别：
+- `ref`：用于创建一个包含单个值的响应式引用。它适用于基本数据类型（如字符串、数字、布尔值）以及对象和数组。当你使用 ref 创建一个响应式引用时，你需要通过 `.value` 属性来访问和修改其值。
+- `reactive`：用于创建一个响应式对象。它适用于复杂的数据结构，如对象和数组。使用 reactive 创建的对象会递归地将其属性转换为响应式的，因此你可以直接访问和修改对象的属性，而不需要使用 `.value`。
+
+## ref
+
+{% btn
+ 'https://vuejs.org/guide/essentials/reactivity-fundamentals.html#why-refs',
+ 'Vue官方文档-ref',
+ far fa-hand-point-right,blue
+ %}
+
+## reactive
+
+{% btn
+ 'https://vuejs.org/guide/essentials/reactivity-fundamentals.html#reactive',
+ 'Vue官方文档-ref',
+ far fa-hand-point-right,blue
+ %}
+
+## 疑点
+
+```js
+import { ref } from 'vue'
+
+export default {
+  setup() {
+    const name = ref('Alice')  // 创建一个ref
+    const age = ref(25)
+    
+    return {
+      name,  // ✅ 保持响应式
+      age,   // ✅ 保持响应式
+    }
+  }
+}
+```
+为什么 ref能保持响应性，而 reactive的属性会丢失？
+
+**ref**：
+
+```js
+// ref 创建的是一个包装对象：
+const name = ref('Alice')
+console.log(name) // RefImpl { value: 'Alice' }
+
+// 返回的是这个 Ref 对象本身
+return { name } // ✅ 返回的是整个 RefImpl 对象
+```
+
+**reactive**：
+
+```js
+const user = reactive({ name: 'Alice' })
+
+// 这里 user.name 是字符串 'Alice'，不是响应式对象
+console.log(user.name) // 'Alice'（普通字符串）
+
+// 返回的是字符串值，不是响应式对象
+return { name: user.name } // ❌ 返回的是普通字符串
+```
+
+**关键记忆点**：
+ref返回的是"箱子"，reactive返回的是"箱子里的东西"
+ref→ 返回整个箱子（响应式）
+reactive.property→ 只拿出箱子里的东西（不响应）
+
+# composition api methods
+
+```html
+<script>
+import { ref } from 'vue'
+
+export default {
+  setup: function () {
+    const username = ref('John Doe')
+    const age = ref(18)
+
+    // 函数里面定义方法是没有问题的
+    const changeAge = function () {
+      age.value += 1
+    }
+
+    return {
+      username,
+      age,
+      changeAge,
+    }
+  },
+}
+</script>
+
+<template>
+  <h1>{{ username }}</h1>
+  <h1>{{ age }}</h1>
+  <button @click="changeAge">change age</button>
+</template>
+```
+
+# composition api computed
+
+```html
+<script>
+import { ref, computed } from 'vue'
+
+export default {
+  setup: function () {
+    const firstName = ref('')
+    const lastName = ref('')
+
+    const setFirstName = function (event) {
+      firstName.value = event.target.value
+    }
+
+    const setLastName = function (event) {
+      lastName.value = event.target.value
+    }
+
+    // fullName 也是一种ref，但是它是一个只读的ref
+    const fullName = computed(function () {
+      return firstName.value + ' ' + lastName.value
+    })
+
+    return {
+      firstName,
+      lastName,
+      setFirstName,
+      setLastName,
+      fullName,
+    }
+  },
+}
+</script>
+
+<template>
+  <div>
+    <input type="text" placeholder="First Name" @input="setFirstName" />
+    <input type="text" placeholder="Last Name" @input="setLastName" />
+  </div>
+  <div>
+    <h2>Full Name: {{ fullName }}</h2>
+  </div>
+</template>
+```
+
+# composition api watch
+
+```html
+<script>
+import { ref, watch } from 'vue'
+
+export default {
+  setup: function () {
+    const age = ref(23)
+
+    const changeAge = function () {
+      age.value += 1
+    }
+
+    watch(age, function (newVal, oldVal) {
+      console.log('Age changed from', oldVal, 'to', newVal)
+    })
+
+    return { age, changeAge }
+  },
+}
+</script>
+
+<template>
+  <div>
+    <button @click="changeAge">change Age</button>
+  </div>
+  <h2>{{ age }}</h2>
+</template>
+```
+
+如果需要watch多个响应式数据，可以传递一个数组作为第一个参数：
+
+```js
+watch([firstName, lastName], function ([newFirstName, newLastName], [oldFirstName, oldLastName]) {
+  console.log('First Name changed from', oldFirstName, 'to', newFirstName)
+  console.log('Last Name changed from', oldLastName, 'to', newLastName)
+})
+```
+
+{% note primary flat %}
+根据vue官方文档，watch的第一个参数可以是以下几种类型：
+- 响应式ref
+- 响应式reactive 对象
+- getter function
+{% endnote %}
+
+**什么是getter function：**
+- 普通JavaScript函数
+- 返回值是我们要监听的数据
+- 每次执行都能获取最新值
+
+```js
+// Vue中的"getter" - 实际上是普通函数
+() => obj.count
+() => props.user.name
+() => x.value + y.value
+```
+
+监听reactive对象属性的时候注意：
+```javascript
+const obj = reactive({ count: 0 })
+
+// this won't work because we are passing a number to watch()
+watch(obj.count, (count) => {
+  console.log(`Count is: ${count}`)
+})
+```
+
+Instead, use a getter:
+```js
+// instead, use a getter:
+watch(
+  () => obj.count,
+  (count) => {
+    console.log(`Count is: ${count}`)
+  }
+)
+```
+
+# Refs
+
+```html
+<script>
+import { ref } from 'vue'
+
+export default {
+  setup: function () {
+    // 初始化的时候是null，因为还没有绑定到真实的DOM元素上
+    const nameInput = ref(null)
+    const name = ref('akbar')
+
+    const focusOnInput = function () {
+      // 跟this.$refs.nameInput.focus()效果一样
+      nameInput.value.focus()
+    }
+
+    return {
+      name,
+      // 这里暴露出去，然后在模板中通过ref绑定
+      nameInput,
+      focusOnInput,
+    }
+  },
+}
+</script>
+
+<template>
+  <div>
+    <input type="text" ref="nameInput" />
+  </div>
+  <div>
+    <button @click="focusOnInput">聚焦nameInput</button>
+  </div>
+</template>
+```
+
+# Props 和 Emits
+
+## Props
+
+**第一种方式**
+```html
+<script>
+export default {
+  props: ['username', 'age'],
+
+  setup() {
+    return {
+    }
+  },
+}
+</script>
+
+<template>
+  <h2>{{ username }}</h2>
+  <h2>{{ age }}</h2>
+</template>
+```
+是的，不要觉得奇怪，props可以直接在模板中使用，因为模板有上下文。
+
+**第二种方式**
+```html
+<script>
+export default {
+  props: {
+    username: {
+      type: String,
+      required: true,
+    },
+    age: {
+      type: Number,
+      required: true,
+    },
+  },
+
+  setup(props) {
+    // 这里的props就是上面定义的props对象
+    console.log(props.username)
+    console.log(props.age)
+
+    return {
+    }
+  },
+}
+</script>
+
+```
+
+**第三种方法是**使用`setup`语法糖：
+```html
+<script setup>
+defineProps({
+  username: {
+    type: String,
+    required: true,
+  },
+  age: {
+    type: Number,
+    required: true,
+  },
+})
+</script>
+```
+
+{% note warning flat %}
+
+注意：
+
+解构props失去响应式的行为在不同Vue版本中表现不同：
+
+1. **Vue 3.5之前**：解构props会失去响应性
+2. **Vue 3.5之后**：编译器自动转换解构变量为props.变量名，保持响应性
+
+监听规则：
+- ✅ 可以监听：props.user
+- ✅ 可以监听：props.anyPropName  
+- ✅ 可以监听：解构的变量（Vue 3.5+）
+
+{% endnote %}
+
+正确示例：
+```js
+// Vue 3.5+ - 可以监听解构的变量
+const { foo } = defineProps(['foo'])
+watch(() => foo, /* ... */) // 正确
+
+// 也可以监听原始prop
+const { foo } = defineProps(['foo'])
+watch(() => props.foo, /* ... */) // 正确
+
+// 或者直接监听props属性
+const props = defineProps(['foo'])
+watch(() => props.foo, /* ... */) // 正确
+
+// 错误示例（不要这样写）
+watch(foo, /* ... */) // ❌ 错误：应该包装成函数
+```
+
+
+## Emits
+
+**第一种方式**
+```html
+<script>
+export default {
+  emits: ['custom-event'],
+  setup(props, context) {
+    const triggerEvent = function () {
+      context.emit('custom-event', 'Hello from child component')
+    }
+
+    return {
+      triggerEvent,
+    }
+  },
+}
+</script>
+
+<template>
+  <button @click="triggerEvent">Trigger Custom Event</button>
+</template>
+```
+
+**第二种方式**使用`setup`语法糖：
+```html
+<script setup>
+defineEmits(['custom-event'])
+const triggerEvent = function () {
+  emit('custom-event', 'Hello from child component')
+}
+</script>
+
+<template>
+  <button @click="triggerEvent">Trigger Custom Event</button>
+</template>
+```
+
+# Provide / Inject
+
+**Provide**:
+
+```html
+<script>
+import { provide, ref } from 'vue'
+
+export default {
+  setup() {
+    const topics = ref([
+      {
+        id: 'basics',
+        title: 'The Basics',
+        description: 'Core Vue basics you have to know',
+        fullText:
+          'Vue is a great framework and it has a couple of key concepts: Data binding, events, components and reactivity - that should tell you something!',
+      },
+      {
+        id: 'components',
+        title: 'Components',
+        description: 'Components are a core concept for building Vue UIs and apps',
+        fullText:
+          'With components, you can split logic (and markup) into separate building blocks and then combine those building blocks (and re-use them) to build powerful user interfaces.',
+      },
+    ])
+
+    const activateTopic = function (topicId) {
+      console.log('Activating topic:', topicId)
+    }
+
+    provide('topics', topics)
+    provide('selectTopic', activateTopic)
+  },
+}
+</script>
+```
+
+**Inject**:
+
+```html
+<script>
+import { inject } from 'vue'
+
+export default {
+  setup() {
+    const topics = inject('topics')
+    const selectTopic = inject('selectTopic')
+
+    return {
+      topics,
+      selectTopic,
+    }
+  },
+}
+
+</script>
+```
+
+# Lifecycle Hooks
+
+![](https://blog-ultimate.oss-cn-beijing.aliyuncs.com/article-image/20251220203837996.png)
+
+需要注意的是，在composition api中，不需要``beforeCreate`和`created`钩子，因为`setup`函数本身就相当于这两个钩子的结合体。
