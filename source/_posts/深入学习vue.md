@@ -988,6 +988,72 @@ export default {
 </template>
 {%endcodeblock%}
 
+**下面在看一个示例代码：**
+
+父组件：
+{% codeblock lang:html mark:13 %}
+<script>
+import { computed, reactive } from 'vue'
+import CoachFilter from '../../components/coaches/CoachFilter.vue'
+
+export default {
+  components: {
+    CoachFilter,
+  },
+
+  setup() {
+    const coachesStore = userCoachesStore()
+
+    const activeFilters = reactive({
+      frontend: false,
+      backend: false,
+      career: false,
+    })
+
+    const filteredCoaches = computed(function () {
+      const filters = activeFilters
+
+      return coachesStore.coachesList.filter(coach => {
+        if (filters.frontend && !coach.areas.includes('frontend')) return false
+        if (filters.backend && !coach.areas.includes('backend')) return false
+        if (filters.career && !coach.areas.includes('career')) return false
+
+        return true
+      })
+    })
+
+    return {
+      coachesStore,
+      activeFilters,
+      filteredCoaches,
+    }
+  },
+}
+</script>
+
+<template>
+  <section>
+    <coach-filter :modelValue="activeFilters" @update:modelValue="activeFilters = $event" />
+    {{activeFilters}}
+  </section>
+</template>
+{%endcodeblock%}
+
+> 这段代码中的`{{activeFilters}}`不会更新的，发现问题所在了吗？
+> 
+> 这段代码中响应数据activeFilters用的是`reactive`，然后用`@update:modelValue="activeFilters = $event"`完整替换了这个响应式对象，所以activeFilters失去了响应式特性，导致模板中的`{{activeFilters}}`不会更新。
+> 解决办法：
+> - 不要完整替换响应式对象，而是更新对象的属性。可以采用对象展开运算符，或者Object.assign()等方式。
+> - 直接使用`ref`来定义activeFilters。
+
+为什么ref可以呢？
+
+| 机制  |	reactive |	ref |
+|-------|----------|-----|
+| 返回值 | Proxy 代理对象 | 响应式包装对象 |
+| 重新赋值 | 变量指向新对象，原代理被丢弃 | .value 是响应式追踪点 |
+| 结果 | ❌ 新对象无响应式 | ✅ 触发响应式更新 |
+
 # 表单校验
 
 可以利用`blur`事件来完成对表单的校验：
