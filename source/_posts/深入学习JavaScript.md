@@ -3794,6 +3794,72 @@ fetch('https:example.com/data', {
 })
 ```
 
+### Content-Type是什么？
+
+在 HTTP 请求中，`Content-Type`（内容类型）是一个极其重要的请求头。它的作用是**告诉服务器：我发送给你的数据是什么格式的，请你按照这种格式来解析。**
+
+如果 `Content-Type` 设置错误，服务器可能无法正确读取你发送的数据，导致报错（如 400 Bad Request 或 500 错误）。
+
+**常见 Content-Type**：
+
+#### 1. `application/json` (最常用)
+
+这是现代 Web 开发（尤其是 RESTful API）中最标准的格式。
+
+* **含义**：发送的是一个 **JSON 字符串**。
+* **前端写法**：需要手动用 `JSON.stringify(data)` 转化。
+* **后端处理**：后端（如 Node.js, Spring Boot）会自动将其解析为对象。
+* **例子**：
+```javascript
+fetch('/api/user', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name: "张三", age: 25 })
+});
+```
+
+#### 2. `application/x-www-form-urlencoded`
+
+这是传统的 **HTML 表单** 默认的提交方式。
+
+* **含义**：数据被编码为键值对，用 `&` 分隔，类似于 URL 的查询字符串。
+* **特点**：不支持发送文件，只能发简单的文本。
+* **数据长相**：`name=%E5%BC%A0%E4%B8%89&age=25`
+* **例子**：
+```javascript
+const params = new URLSearchParams({ name: "张三", age: 25 });
+fetch('/api/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: params.toString()
+});
+```
+
+#### 3. `multipart/form-data`
+
+这种格式专门用于 **上传文件** 或发送包含二进制数据的内容。
+
+* **含义**：数据被分成多个部分（parts），每个部分可以有不同的类型（如文本字段 + 图片文件）。
+* **注意点**：使用 `fetch` 发送 `FormData` 对象时，**不要手动设置 Content-Type**。浏览器会自动帮你添加，并生成一个复杂的 `boundary`（边界字符串）来区分不同的字段。
+* **例子**：
+```javascript
+const formData = new FormData();
+formData.append('username', 'Alice');
+formData.append('avatar', fileInput.files[0]); // 文件对象
+
+fetch('/upload', {
+  method: 'POST',
+  body: formData // 此时 fetch 会自动识别并设置 multipart/form-data
+});
+```
+
+#### 4. `text/plain`
+
+* **含义**：纯文本格式。
+* **特点**：没有任何特定的结构。服务器通常不会对其进行解析，只会当做一串普通的文字处理。现在在 API 开发中已经很少使用了。
+
+---
+
 ## Callback Hell(回调地狱)
 
 回调地狱是指在使用回调函数处理异步操作时，代码层层嵌套，导致代码难以阅读和维护的情况。
