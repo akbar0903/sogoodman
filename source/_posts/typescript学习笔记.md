@@ -56,6 +56,8 @@ tsc --init
     /* Modules */
     /********************* 配置编译结果会输出哪种模块规范的代码，比如 CommonJS、ES6 模块等 *********************************/
     "module": "commonjs",                                /* Specify what module code is generated. */
+
+    /********************* rootDir配置要编译的ts文件的目录，比如./src目录 *********************************/
     // "rootDir": "./",                                  /* Specify the root folder within your source files. */
     // "moduleResolution": "node10",                     /* Specify how TypeScript looks up a file from a given module specifier. */
     // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
@@ -85,11 +87,17 @@ tsc --init
     // "declaration": true,                              /* Generate .d.ts files from TypeScript and JavaScript files in your project. */
     // "declarationMap": true,                           /* Create sourcemaps for d.ts files. */
     // "emitDeclarationOnly": true,                      /* Only output d.ts files and not JavaScript files. */
+
+    /********************* 通过开启sourceMap可以对应的filename.js.map文件，然后可以通过浏览器的调试工具调试ts代码 *********************************/
     // "sourceMap": true,                                /* Create source map files for emitted JavaScript files. */
     // "inlineSourceMap": true,                          /* Include sourcemap files inside the emitted JavaScript. */
     // "noEmit": true,                                   /* Disable emitting files from a compilation. */
     // "outFile": "./",                                  /* Specify a file that bundles all outputs into one JavaScript file. If 'declaration' is true, also designates a file that bundles all .d.ts output. */
+
+    /********************* outDir配置编译后的文件输出目录，比如./dist目录 *********************************/
     // "outDir": "./",                                   /* Specify an output folder for all emitted files. */
+
+    /********************* removeComments 配置ts中的注释是否也编译到输出文件中 *********************************/
     // "removeComments": true,                           /* Disable emitting comments. */
     // "importHelpers": true,                            /* Allow importing helper functions from tslib once per project, instead of including them per-file. */
     // "downlevelIteration": true,                       /* Emit more compliant, but verbose and less performant JavaScript for iteration. */
@@ -100,6 +108,8 @@ tsc --init
     // "newLine": "crlf",                                /* Set the newline character for emitting files. */
     // "stripInternal": true,                            /* Disable emitting declarations that have '@internal' in their JSDoc comments. */
     // "noEmitHelpers": true,                            /* Disable generating custom helper functions like '__extends' in compiled output. */
+
+    /********************* noEmitOnError配置如果有类型检查错误则不输出文件, 直到修复错误 *********************************/
     // "noEmitOnError": true,                            /* Disable emitting files if any type checking errors are reported. */
     // "preserveConstEnums": true,                       /* Disable erasing 'const enum' declarations in generated code. */
     // "declarationDir": "./",                           /* Specify the output directory for generated declaration files. */
@@ -114,6 +124,7 @@ tsc --init
     "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
 
     /* Type Checking */
+    
     "strict": true,                                      /* Enable all strict type-checking options. */
     // "noImplicitAny": true,                            /* Enable error reporting for expressions and declarations with an implied 'any' type. */
     // "strictNullChecks": true,                         /* When type checking, take into account 'null' and 'undefined'. */
@@ -123,7 +134,10 @@ tsc --init
     // "strictBuiltinIteratorReturn": true,              /* Built-in iterators are instantiated with a 'TReturn' type of 'undefined' instead of 'any'. */
     // "noImplicitThis": true,                           /* Enable error reporting when 'this' is given the type 'any'. */
     // "useUnknownInCatchVariables": true,               /* Default catch clause variables as 'unknown' instead of 'any'. */
+
+    /********************* 编译后的JavaScript文件最上面带有'use strict' *********************************/
     // "alwaysStrict": true,                             /* Ensure 'use strict' is always emitted. */
+
     // "noUnusedLocals": true,                           /* Enable error reporting when local variables aren't read. */
     // "noUnusedParameters": true,                       /* Raise an error when a function parameter isn't read. */
     // "exactOptionalPropertyTypes": true,               /* Interpret optional property types as written, rather than adding 'undefined'. */
@@ -302,3 +316,182 @@ userId = 456;      // 也正确
 
 # 类型断言 `as`
 
+
+# Object Oriented Programming 面向对象编程
+
+## 类 class
+
+下面看一个示例代码：
+```typescript
+class Department {
+  name: string
+
+  constructor(name: string) {
+    this.name = name
+  }
+
+  describe(this: Department) {
+    console.log(`Department name: ${this.name}`)
+  }
+}
+
+const department = new Department('Learn01')
+department.describe()
+
+const myDepartment = { describe: department.describe }
+myDepartment.describe()  // 这里报错
+```
+
+为什么`myDepartment.describe()`会报错呢？
+我们需要先搞懂`describe(this: Department)`这里的this是什么意思：
+
+这里的 this: Department 是 TypeScript 的虚拟参数。它在运行时不存在，但在编译时，它告诉 TypeScript：“只有当 this 指向一个符合 Department 结构的实例时，才能调用这个方法。”
+
+当执行以下代码时：
+```typescript
+const myDepartment = { describe: department.describe }
+myDepartment.describe()
+```
+- 运行时的行为：在 JavaScript 中，当你通过 myDepartment.describe() 调用函数时，函数内部的 this 会指向 myDepartment 这个对象。
+- 编译时的检查：TypeScript 检查发现 myDepartment 的类型是 { describe: function }。
+- 冲突点：describe 方法要求 this 必须是一个 Department（必须包含 name 属性和 describe 方法），但你的 myDepartment 对象没有 name 属性。
+
+因此，TypeScript 抛出错误，警告你：“你正在一个没有 name 属性的对象上调用一个需要 name 属性的方法，这会导致运行时错误（或输出 undefined）。”
+
+所以，我们只要把 myDepartment 对象改成符合 Department 结构的对象就可以了：
+```typescript
+const myDepartment = {
+  name: 'Learn02',
+  describe: department.describe
+}
+myDepartment.describe()  // 正常输出 Department name: Learn02
+```
+
+## private 和 public 修饰符
+
+### public 修饰符
+
+默认情况下，类的属性和方法都是 public 的，比如：
+```typescript
+class Department {
+  name: string  // 默认是 public
+
+  constructor(name: string) {
+    this.name = name
+  }
+
+  describe(this: Department) {
+    console.log(`Department name: ${this.name}`)
+  }
+}
+
+const department = new Department('Learn01')
+// 直接访问 name 属性
+console.log(department.name)  // 输出 Learn01
+```
+
+### private 修饰符
+
+我们看一下下面的代码有什么问题：
+```typescript
+class Department {
+  name: string
+  employees: string[] = []
+
+  constructor(name: string) {
+    this.name = name
+  }
+
+  describe(this: Department) {
+    console.log(`Department name: ${this.name}`)
+  }
+
+  addEmployee(employee: string) {
+    this.employees.push(employee)
+  }
+
+  printEmployeeInformation() {
+    console.log('count of employee',this.employees.length)
+    console.log('employees:', this.employees)
+  }
+}
+
+const department = new Department('Learn01')
+// 直接department添加employee
+department.employees.push('Max', 'Manu')
+
+department.printEmployeeInformation()
+```
+
+上面代码中，`department.employees.push('Max', 'Manu')` 这一行代码直接访问了 `employees` 属性并修改了它。这违反了封装的原则，因为 `employees` 应该只能通过类的方法来修改。
+
+为了解决这个问题，我们可以使用 `private` 修饰符将 `employees` 属性设为私有：
+```typescript
+class Department {
+  name: string
+  private employees: string[] = []
+  ...
+}
+```
+现在只能通过 `addEmployee` 方法来添加员工，外部代码无法直接访问 `employees` 属性，从而保护了数据的完整性。
+
+## 简化类属性的声明和初始化
+
+```typescript
+class Department {
+  private id: string
+  private name: string
+
+  constructor(id: string, name: string) {
+    this.id = id
+    this.name = name
+  }
+}
+```
+
+可以简化为：
+```typescript
+class Department {
+  constructor(private id: string, private name: string) {
+  }
+}
+```
+
+## readonly 修饰符
+
+`readonly` 修饰符用于将类的属性设置为只读属性。一旦赋值后，就不能再修改它们。
+
+```typescript
+class Department {
+  constructor(private readonly id: string, private name: string) {
+  }
+} 
+```
+这个很合理，因为部门的ID通常是固定的，不应该在创建后被修改。
+
+## inheritance 继承
+
+```typescript
+class Department {
+  private id: string
+  private name: string
+  private employees: string[] = []
+
+  constructor(id: string, name: string) {
+    this.id = id
+    this.name = name
+  }
+}
+```
+
+ITDepartment 继承自 Department 类：
+```typescript
+class ITDepartment extends Department {
+  admins: string[]
+
+  constructor(id: string, admins: string[]) {
+    super(id, 'IT') // calling the base class constructor
+    this.admins = admins
+  }
+}
+```

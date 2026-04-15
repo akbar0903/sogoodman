@@ -1845,6 +1845,9 @@ const { name, age, family } = akbar
 console.log(name, age, family)
 ```
 
+> 对象解构和数组解构的区别：对象解构是根据`属性名`来解构的，数组解构是根据`位置`来解构的。
+> 所以解构对象的时候，变量名必须和属性名一致。
+
 自定义属性名
 
 ```js
@@ -3188,19 +3191,21 @@ boundGreet() // 输出: Hello, my name is Akbar
 
 {% codeblock lang:typescript mark:12 %}
 const app = Vue.createApp({
+
 data() {
-return {
-counter: 0,
-}
+  return {
+    counter: 0,
+  }
 },
+
 watch: {
-counter(value) {
-if (value > 50) {
-window.setTimeout(function () { // // this 原本指向的是 window 对象
-this.counter = 0
-}.bind(this), 2000) // 通过 bind 将 this 绑定到 Vue 实例
-}
-},
+  counter(value) {
+    if (value > 50) {
+      window.setTimeout(function () { // // this 原本指向的是 window 对象
+      this.counter = 0
+      }.bind(this), 2000) // 通过 bind 将 this 绑定到 Vue 实例
+    }
+  },
 },
 {%endcodeblock%}
 
